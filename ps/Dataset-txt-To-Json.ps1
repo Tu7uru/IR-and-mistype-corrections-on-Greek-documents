@@ -59,6 +59,6 @@ $datasetToJson = [PSCustomObject]@{
                         Queries = $queries
                         Documents = $docs
                     }
-#$datasetToJson += $queries
-#$datasetToJson += $docs
+$datasetToJson += $queries
+$datasetToJson += $docs
 $datasetToJson | ConvertTo-Json -Depth 3 | Out-File "..\dataset\dataset.json" -Encoding utf8 -Force
