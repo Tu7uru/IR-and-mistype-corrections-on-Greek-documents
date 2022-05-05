@@ -44,13 +44,13 @@ public class JsonReader {
         this.queries = queries;
     }
 
-    public static List<Document> parseJsonFileDocuments(String path) throws IOException, ParseException {
+    public static ArrayList<Document> parseJsonFileDocuments(String path) throws IOException, ParseException {
 
         int id;
         String title;
         String body;
 
-        List<Document> documents = new ArrayList<>();
+        ArrayList<Document> documents = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
         Object jsonData  = parser.parse(new FileReader(path));
@@ -98,7 +98,7 @@ public class JsonReader {
         return documents;
     }
 
-    public static List<Query> parseJsonFileQueries(String path) throws IOException, ParseException {
+    public static ArrayList<Query> parseJsonFileQueries(String path) throws IOException, ParseException {
         int id;
         String query;
         HashMap<Integer, Integer> relDocs_relPosition;
@@ -107,7 +107,7 @@ public class JsonReader {
         int relevanceRank = -1;
         Boolean isDocId = true;
 
-        List<Query> queries = new ArrayList<>();
+        ArrayList<Query> queries = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
         JSONParser relDocs_parser = new JSONParser();
@@ -157,7 +157,7 @@ public class JsonReader {
         for(Document Doc : parseJsonFileDocuments("./src/main/resources/dataset.json")) {
             System.out.println("{" + Doc.getID() + "," + Doc.getTitle() + "," + Doc.getBody() + "}");
         }
-        for(Query q: parseJsonFileQueries("./src/main/resources/dataset.json")) {
+        for(Query q: parseJsonFileQueries("src/main/resources/dataset.json")) {
             System.out.println("{" + q.getID() + "," + q.getQuery() + "," + q.getHashMap()+ "}");
         }
     }
