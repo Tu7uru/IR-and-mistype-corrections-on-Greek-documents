@@ -17,6 +17,10 @@ public class Recall {
         int numRelevant= relevantDocIds.size();
         int numRelevantRetrieved = 0;
 
+        if(numRelevant == 0) {
+            return 0.0;
+        }
+
         for(Document doc : docsRetrieved) {
             if(relevantDocIds.contains(doc.getID())) {
                 numRelevantRetrieved++;

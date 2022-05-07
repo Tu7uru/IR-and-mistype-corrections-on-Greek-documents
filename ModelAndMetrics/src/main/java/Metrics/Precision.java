@@ -18,6 +18,10 @@ public class Precision {
         int numRetrieved = docsRetrieved.size();
         int numRelevantRetrieved = 0;
 
+        if(numRetrieved == 0) {
+            return 0.0;
+        }
+
         for(Document doc : docsRetrieved) {
             if(relevantDocIds.contains(doc.getID())) {
                 numRelevantRetrieved++;

@@ -16,6 +16,10 @@ public class Fall_Out {
         int numNonRelevant = totalNumOfDocs - relevantDocIds.size();
         int numNonRelevantRetrieved = 0;
 
+        if (numNonRelevant == 0) {
+            return 0.0;
+        }
+
         for(Document doc : docsRetrieved) {
             if(!relevantDocIds.contains(doc.getID())) {
                 numNonRelevantRetrieved++;

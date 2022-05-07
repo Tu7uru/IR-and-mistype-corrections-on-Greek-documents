@@ -19,6 +19,10 @@ public class F_Measure {
 
         double numerator = 2 * precisionScore * recallScore;
         double denominator = precisionScore + recallScore;
+
+        if(denominator == 0) {
+            return 0.0;
+        }
         return numerator / denominator;
     }
 
