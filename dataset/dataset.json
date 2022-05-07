@@ -2,7 +2,7 @@
     "Queries":  [
                     {
                         "ID":  0,
-                        "Query":  "καρδαμο",
+                        "Query":  "κάρδαμο",
                         "RelevantDocs":  [
                                              "@{DocId=0; RelevanceRank=0}",
                                              "@{DocId=1; RelevanceRank=1}",
