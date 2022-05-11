@@ -34,7 +34,7 @@ public class Search {
         ArrayList<Document> documents = parseJsonFileDocuments("src/main/resources/dataset.json");
 
         Boolean removeStopwords = Boolean.TRUE;
-        Boolean applyStemming = Boolean.FALSE;
+        Boolean applyStemming = Boolean.TRUE;
         Boolean allQueryTermsMustExist = Boolean.FALSE;
 
         ArrayList<Document> documentsRetrieved = new ArrayList<>();
