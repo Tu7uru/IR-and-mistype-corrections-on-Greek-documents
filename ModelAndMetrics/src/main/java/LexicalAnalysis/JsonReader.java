@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import Model.Document;
@@ -42,6 +43,21 @@ public class JsonReader {
 
     public void setQueries(ArrayList<Query> queries) {
         this.queries = queries;
+    }
+
+    public static List<String> parseJsonStopwords(String path) throws IOException, ParseException {
+        List<String> stopwords = new ArrayList<>();
+
+        ArrayList<Query> queries = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+        //JSONParser relDocs_parser = new JSONParser();
+        Object jsonData = parser.parse(new FileReader(path));
+        //JSONArray jsonQueries = (JSONArray) ((JSONObject) jsonData).get("Queries");
+        for(Object x : (JSONArray)jsonData) {
+            stopwords.add(x.toString().toLowerCase());
+        }
+        return stopwords;
     }
 
     public static ArrayList<Document> parseJsonFileDocuments(String path) throws IOException, ParseException {
@@ -154,6 +170,7 @@ public class JsonReader {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
+        parseJsonStopwords("./src/main/resources/el-stopwords.json");
         for(Document Doc : parseJsonFileDocuments("./src/main/resources/dataset.json")) {
             System.out.println("{" + Doc.getID() + "," + Doc.getTitle() + "," + Doc.getBody() + "}");
         }
