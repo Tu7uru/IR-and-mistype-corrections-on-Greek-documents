@@ -71,7 +71,7 @@
         }
       },
       "analyzer": {
-        "rebuilt_greek": {
+        "$AnalyzerName": {
           "tokenizer":  "standard",
           "filter": [
             "greek_lowercase",
@@ -107,7 +107,7 @@
         }
       },
       "analyzer": {
-        "rebuilt_greek": {
+        "$AnalyzerName": {
           "tokenizer":  "standard",
           "filter": [
             "greek_lowercase",
@@ -255,11 +255,17 @@ function Search {
         $IndexName
     )
 
-
-    $data = Get-Data -path "../dataset/dataset.json"
+    $pathtoParent =(get-item $PSScriptRoot ).parent.parent.FullName
+    $data = Get-Data -path "$pathtoParent/dataset/dataset.json"
     $documents = $data.Documents
     $queries = $data.Queries
-    
+    Write-Host "count:"$queries.count
+
+    $avPrecision = 0
+    $avRecall = 0
+    $avF_Measure = 0
+    $avFall_Out = 0
+
     foreach($query in $queries) {
         $searchResult = Invoke-RestMethod "https://localhost:9200/$IndexName/_search?q=$($query.Query)" -Headers $headers -ContentType 'text/plain; charset=utf-8' -Method GET -Credential $Credentials
         $idsRetrieved = $searchResult.hits.hits._source.ID
@@ -267,9 +273,22 @@ function Search {
         
         $precision = Get-Precision -DocumentsRetrieved $idsRetrieved -DocumentsExpected $idsExpected
         $recall = Get-Recall -DocumentsRetrieved $idsRetrieved -DocumentsExpected $idsExpected
-        Get-F_Measure -Precision $precision -Recall $recall
-        Get-Fall_Out -DocumentsRetrieved $idsRetrieved -DocumentsExpected $idsExpected -AllDocuments $documents
+        $f_measure = Get-F_Measure -Precision $precision -Recall $recall
+        $fall_out = Get-Fall_Out -DocumentsRetrieved $idsRetrieved -DocumentsExpected $idsExpected -AllDocuments $documents
+        Write-Host "ID:$($query.ID), precision:$precision, recall:$recall, f_measure:$f_measure, fall_out:$fall_out"
+
+        $avPrecision += $precision
+        $avRecall += $Recall
+        $avF_Measure += $f_measure
+        $avFall_Out += $fall_out
     }
+
+    $avPrecision /=  $queries.Count
+    $avRecall /= $queries.Count
+    $avF_Measure /= $queries.Count
+    $avFall_Out /= $queries.Count
+
+    Write-Host "av precision:$avPrecision, av recall:$avRecall, av f_measure:$avF_Measure, av fall_out:$avFall_Out"
 }
 
 Export-ModuleMember -Function Search

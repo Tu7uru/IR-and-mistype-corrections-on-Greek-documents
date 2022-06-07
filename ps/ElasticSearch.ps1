@@ -19,25 +19,31 @@
     [String]$IndexBodyDefinition,
     
     [Parameter(Mandatory = $true,ParameterSetName = 'Get')]
-    [switch]$retrieveDataset,
+    [switch]$InvokeSearch,
     
     [Parameter(Mandatory = $true,ParameterSetName = 'Convert')]
     [switch]$convertJsonDocsToBulkInsert,
     
     [Parameter(Mandatory = $true)]
-    [string]$indexName,
+    [string]$IndexName,
     
     [Parameter(Mandatory = $true,ParameterSetName = 'Convert')]
     [Parameter(Mandatory = $true,ParameterSetName = 'Load')]
-    [string]$inputFilename,
+    [string]$InputFilename,
     
     [Parameter(Mandatory = $true,ParameterSetName = 'Convert')]
-    [string]$outputFilename
+    [string]$OutputFilename#,
+
+    #[Parameter(Mandatory = $true)]
+    #[string]$Username,
+    #
+    #[Parameter(Mandatory = $true)]
+    #[string]$Password
 )
 
 Import-Module "$PSScriptRoot\ElasticSearch\Operations.psm1" -Force
 
-if($loadBulk -or $retrieveDataset -or $createIndex) {
+if($loadBulk -or $InvokeSearch -or $createIndex) {
 
     $username = "elastic"
     $securePwd = ConvertTo-SecureString "bczk1THwmVIciEZYeCaq" -AsPlainText -Force
@@ -63,36 +69,31 @@ if($loadBulk -or $retrieveDataset -or $createIndex) {
             "OData-Version"="4.0";
     };
 
-
     if($loadBulk) {
-        $body = Get-Content -Path "..\dataset\$inputFilename"
-        Invoke-RestMethod "https://localhost:9200/$indexName/_bulk?pretty" -Method Post -ContentType 'application/x-ndjson' -InFile "..\dataset\$inputFilename" -Credential $credential
+        $pathtoParent =(get-item $PSScriptRoot ).parent.FullName
+        $body = Get-Content -Path "$pathtoParent\dataset\ES_ImportFormatDataset\$inputFilename"
+        if($InputFilename -eq "ElasticS_Documents.json") {
+            $body = $body -replace "`"_index`" : `"dataset`"", "`"_index`" : `"$indexName`""
+            #$body | Out-File "$pathtoParent\dataset\ES_ImportFormatDataset\$indexName.json" -Encoding utf8
+        }
+        Invoke-RestMethod "https://localhost:9200/$indexName/_bulk?pretty" -Method Post -ContentType 'application/x-ndjson' -InFile "$pathtoParent\dataset\ES_ImportFormatDataset\$indexName.json" -Credential $credential
         #Invoke-RestMethod "https://localhost:9200/$indexName/_bulk?pretty" -Method Post -ContentType 'application/x-ndjson' -Body $body  -Credential $credential
     }
     elseif($createIndex) {
-#            $body = @"
-#{
-#"mappings": {
-#      "properties": {
-#          "ID": {"type":"integer"},
-#          "Title" :{"type":"text","analyzer": "my_greek_analyzer"},
-#          "Body": {"type":"text","analyzer": "my_greek_analyzer"}
-#    }
-#  },
-#  "settings": {
-#    "analysis": {
-#      "analyzer": {
-#        "my_greek_analyzer": {
-#          "type": "standard",
-#          "max_token_length": 150,
-#          "stopwords": "_greek_"
-#        }
-#      }
-#    }
-#  }
-#}
-#"@
-        $mappings = @"
+        # Index body definition for no stemming no stopwords
+        $IndexBodyDIndexBodyDefinition = @"
+{
+  "mappings": {
+      "properties": {
+          "ID": {"type":"integer"},
+          "Title" :{"type":"text"},
+          "Body": {"type":"text"}
+    }
+  }
+}
+"@
+    
+$mappings = @"
   "mappings": {
       "properties": {
           "ID": {"type":"integer"},
@@ -115,8 +116,8 @@ if($loadBulk -or $retrieveDataset -or $createIndex) {
         }
     }
     else {
-         $tst = Invoke-RestMethod "https://localhost:9200/dataset/_search?q= Αφρική" -Headers $headers -ContentType 'text/plain; charset=utf-8' -Method GET  -Credential $credential 
-         Search -Credentials $credential
+         #$tst = Invoke-RestMethod "https://localhost:9200/dataset/_search?q=Αφρική" -Headers $headers -ContentType 'text/plain; charset=utf-8' -Method GET  -Credential $credential 
+         Search -Credentials $credential -IndexName $IndexName
     }
 }
 elseif($convertJsonDocsToBulkInsert){
