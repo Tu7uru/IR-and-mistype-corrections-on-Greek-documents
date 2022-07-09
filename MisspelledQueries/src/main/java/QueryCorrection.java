@@ -257,7 +257,11 @@ public class QueryCorrection {
         This function takes the queries with minimum distance from the query that was given and
         finds which of the vocabulary queries has the smallest keyboard distance
     */
-    public static String KeyboardDistance(ArrayList<String> validQueries,String query,Integer keyboardDistance) {
+
+    public static Boolean hasCharacterAddition(String query){
+        return null;
+    }
+    public static String KeyboardDistance(ArrayList<String> validQueries,String query,Integer keyboardDistance,Integer EditDistanceQ) {
 
         /*
             Find which character/s is/are the incorrect one/s
@@ -278,10 +282,23 @@ public class QueryCorrection {
         /*
             subst
         */
+        String correctString = "";
         for(String validQuery : validQueries) {
             for(int i = 0; i < query.length(); i++) {
                 if(query.charAt(i) != validQuery.charAt(i)) {
-
+                    ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(query.charAt(i),1);
+                    //System.out.println(surroundingCharacters);
+                    for(char character: surroundingCharacters) {
+                        String updatedString = TransformToMisspelledQueries.replaceChar(query,character,i);
+                        //System.out.println("query: "+query+" updatedstring: "+updatedString);
+                        if(EditDistance.calculate(validQuery,updatedString) < EditDistanceQ) {
+                            correctString = updatedString;
+                        }
+                        if(EditDistanceQ > EditDistance.calculate(validQuery,updatedString)) {
+                            EditDistanceQ = EditDistance.calculate(validQuery,updatedString);
+                            query = updatedString;
+                        }
+                    }
                 }
             }
         }
@@ -290,7 +307,7 @@ public class QueryCorrection {
         */
 
 
-        return null;
+        return correctString;
     }
 
     public static void main(String[] args) {
@@ -339,5 +356,23 @@ public class QueryCorrection {
                 }
             }
         }*/
+
+        /* test sorting on keyboard distance
+
+         */
+        ArrayList<String> validQs = new ArrayList<>();
+        ArrayList<String> validQs2 = new ArrayList<>();
+
+        validQs.add("βάζω");
+        validQs.add("βάζο");
+
+        validQs2.add("βάζο");
+        validQs2.add("βάζω");
+
+        System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
+        System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
+
+        System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
+        System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
     }
 }
