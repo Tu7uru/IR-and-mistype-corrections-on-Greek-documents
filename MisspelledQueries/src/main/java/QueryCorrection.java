@@ -12,10 +12,26 @@ public class QueryCorrection {
             {   null,  {'ζ','Ζ'},{'χ','Χ'},{'ψ','Ψ'} ,{'ω','Ω'},{'β','Β'},{'ν','Ν'},{'μ','Μ'},{',','<'},{'.','>'},{'/','?'}}
     };
 
+    /* take with tonos or without tonos and compare based on greekKeyboardLayout
 
+     */
+
+    private static char[][] greekVowelAccentuation = {
+            {'α','ά'},
+            {'ε','έ'},
+            {'η','ή'},
+            {'ι','ί','ϊ','ΐ'},
+            {'ο','ό'},
+            {'υ','ύ','ϋ','ΰ'},
+            {'ω','ώ'}
+    };
 
     public static char[][][] GetGreekKeyboardLayout() {
         return greekKeyboardLayout;
+    }
+
+    public static char[][] GetGreekVowelAccentuations(){
+        return greekVowelAccentuation;
     }
 
     /*
@@ -83,6 +99,17 @@ public class QueryCorrection {
             }
         }
         return null;
+    }
+
+    public static Character RemoveAccentuations(char input) {
+        for(char[] row : greekVowelAccentuation) {
+            for(char letter : row) {
+                if(input == letter) {
+                    return row[0];
+                }
+            }
+        }
+        return input;
     }
 
     public static ArrayList<Character> GetSurroundingCharacters(Character incorrectCharacter,Integer distance) {
@@ -253,15 +280,38 @@ public class QueryCorrection {
         return surroundingCharacters;
     }
 
-    /*
-        This function takes the queries with minimum distance from the query that was given and
-        finds which of the vocabulary queries has the smallest keyboard distance
-    */
 
-    public static Boolean hasCharacterAddition(String query){
-        return null;
+    /**
+     *
+     * @param input input string to be padded
+     * @param numOfPads number of pads to add on the right(' ' - space pads)
+     * @return padded string
+     */
+    public static String PadString(String input,int numOfPads){
+
+        for(int i = 0; i < numOfPads; i++){
+            input += ' ';
+        }
+        return input;
     }
+
+
+    /**
+     *
+     * @param validQueries : the list of queries that were marked as valid based on the distance from the query given(minimum distance)
+     * @param query : The query that is being corrected/tested
+     * @param keyboardDistance : keyboard distance to check(1 or 2)
+     * @param EditDistanceQ : all valid queries have the same distance from the query given
+     * @return should be a sorted list of the queries based on the relativity with the query given()
+     */
     public static String KeyboardDistance(ArrayList<String> validQueries,String query,Integer keyboardDistance,Integer EditDistanceQ) {
+
+        /*
+            if query length is greater than valid query length then use LCS
+αοοουημα -> αίουημα -> αίοτημα
+copy from valid str to find if letter has ί ?
+         */
+
 
         /*
             Find which character/s is/are the incorrect one/s
@@ -273,26 +323,49 @@ public class QueryCorrection {
 
         /*
             add
+
+            find which character is extra and ignore it, then find if incorrect character exists and check if any adjacent reduces edit distance
         */
 
         /*
             del
+
+            find if incorrect character exists and check if any adjacent reduces edit distance
         */
 
         /*
             subst
         */
+        //if same length as valid
+        int length;
         String correctString = "";
+
+        String paddedQuery = "";
+        String paddedValidQuery = "";
+
         for(String validQuery : validQueries) {
-            for(int i = 0; i < query.length(); i++) {
-                if(query.charAt(i) != validQuery.charAt(i)) {
-                    ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(query.charAt(i),1);
+
+            if(query.length() < validQuery.length()) {
+                length = validQuery.length();
+                paddedQuery = PadString(query,validQuery.length() - query.length());
+                paddedValidQuery = validQuery;
+            } else {
+                length = query.length();
+                paddedQuery = query;
+                paddedValidQuery = PadString(validQuery,query.length() - validQuery.length());
+            }
+
+            for(int i = 0; i < length; i++) {
+                //System.out.println(query.charAt(i)+ " vQ:" + validQuery.charAt(i));
+                if(paddedQuery.charAt(i) != paddedValidQuery.charAt(i)) {
+                    ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(RemoveAccentuations(paddedQuery.charAt(i)),1);
                     //System.out.println(surroundingCharacters);
-                    for(char character: surroundingCharacters) {
-                        String updatedString = TransformToMisspelledQueries.replaceChar(query,character,i);
+                    for(char adjacentCharacter: surroundingCharacters) {
+                        String updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
                         //System.out.println("query: "+query+" updatedstring: "+updatedString);
                         if(EditDistance.calculate(validQuery,updatedString) < EditDistanceQ) {
                             correctString = updatedString;
+                            //System.out.println(correctString);
                         }
                         if(EditDistanceQ > EditDistance.calculate(validQuery,updatedString)) {
                             EditDistanceQ = EditDistance.calculate(validQuery,updatedString);
@@ -304,9 +377,9 @@ public class QueryCorrection {
         }
         /*
             transp
+
+            if transposition then keyboard error offers nothing
         */
-
-
         return correctString;
     }
 
@@ -357,20 +430,52 @@ public class QueryCorrection {
             }
         }*/
 
-        /* test sorting on keyboard distance
+        /*
+            Remove Accentuations testing
 
+            Function to test - RemoveAccentuations
+
+            Result: Correct
+         */
+
+        /*for (char[] row : GetGreekVowelAccentuations()) {
+            for(char letter : row) {
+                System.out.println(RemoveAccentuations(letter));
+            }
+        }*/
+
+        /*
+            test - String padding on the right
+
+            worked
+         */
+        /*String x = "βαζ";
+
+        System.out.println("pad:" + PadString(x,3) + " | x: "+ x);
+        */
+
+        /*
+            Test- Finding correct Word on keyboard distance or finding any correction based on keyboard error
          */
         ArrayList<String> validQs = new ArrayList<>();
         ArrayList<String> validQs2 = new ArrayList<>();
 
-        validQs.add("βάζω");
-        validQs.add("βάζο");
+        //validQs.add("βάζω");
+        //validQs.add("βάζο");
+        validQs.add("αιτημα");
+        validQs.add("ετοιμα");
+
+        //αοτοιμα;
+        //ετοιμα 2;
+        //εοτοιμα 1;
+
 
         validQs2.add("βάζο");
         validQs2.add("βάζω");
 
-        System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
-        System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
+        //System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
+        //System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
+        System.out.println(KeyboardDistance(validQs,"αοοοτοιμα",1,5));
 
         System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
         System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
