@@ -342,6 +342,7 @@ copy from valid str to find if letter has ί ?
         int improvedStringEditDistance = 100;
 
         int expectedLetterIndex;
+        //Boolean foundCorrectAdjacent;
         String correctString = "";
 
         String paddedQuery = "";
@@ -366,21 +367,27 @@ copy from valid str to find if letter has ί ?
             expectedLetterIndex = 0;
             for(int i = 0; i < length; i++) {
                 //System.out.println(query.charAt(i)+ " vQ:" + validQuery.charAt(i));
+                //foundCorrectAdjacent = Boolean.FALSE;
                 if(paddedQuery.charAt(i) != paddedValidQuery.charAt(i)) {
                     ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(RemoveAccentuations(paddedQuery.charAt(i)),1);
                     //System.out.println(surroundingCharacters);
                     for(char adjacentCharacter: surroundingCharacters) {
                         String updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
-                        System.out.println("query: "+query+" updatedstring: "+updatedString);
+                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
+                        if(adjacentCharacter == RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex))) {
+                            System.out.println("eq but diff" + updatedString.charAt(i) + " padQ: " + paddedValidQuery.charAt(expectedLetterIndex) );
+                            updatedString = TransformToMisspelledQueries.replaceChar(updatedString,paddedValidQuery.charAt(expectedLetterIndex),i);
+                        }
                         updatedQueryEditDistance = EditDistance.calculate(validQuery,updatedString);
                         System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance + " improved d" + improvedStringEditDistance);
                         if(updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
                             System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
                             correctString = updatedString;
                             //improvedStringEditDistance = updatedStringEditDistance;
-                            if(paddedValidQuery.charAt(expectedLetterIndex) == RemoveAccentuations(adjacentCharacter)) {
+                            if(RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex)) == adjacentCharacter) {
                                 query = updatedString;
                                 currentQueryEditDistance = updatedQueryEditDistance;
+                                //foundCorrectAdjacent = Boolean.TRUE;
                                 //improvedStringEditDistance = updatedQueryEditDistance;
                                 expectedLetterIndex++;
                                 break;
@@ -395,6 +402,9 @@ copy from valid str to find if letter has ί ?
                         //    query = updatedString;
                         //}
                     }
+                    //if(!foundCorrectAdjacent) {
+
+                    //}
                 }
                 else {
                     expectedLetterIndex++;
@@ -489,7 +499,7 @@ copy from valid str to find if letter has ί ?
 
         //validQs.add("βάζω");
         //validQs.add("βάζο");
-        validQs.add(new Pair("αιτημα",6));
+        validQs.add(new Pair("αίτημα",7));
         //validQs.add("ετοιμα");
 
         //αοτοιμα;
@@ -502,7 +512,7 @@ copy from valid str to find if letter has ί ?
 
         //System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
-        System.out.println(KeyboardDistance(validQs,"αοουυοιμα",1));
+        System.out.println(KeyboardDistance(validQs,"αλοουυοιμα",1));
 
         //System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
