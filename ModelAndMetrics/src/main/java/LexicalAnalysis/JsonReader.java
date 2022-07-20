@@ -5,10 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import Model.Document;
 import Model.Query;
@@ -23,6 +20,7 @@ public class JsonReader {
 
     ArrayList<Document> documents;
     ArrayList<Query> queries;
+    ArrayList<Query> consonants;
 
     public JsonReader() {
         this.documents = new ArrayList<>();
@@ -83,34 +81,6 @@ public class JsonReader {
             doc.setBody(body);
             documents.add(doc);
         }
-
-        /*JSONArray a = (JSONArray) parser.parse(new FileReader("./src/main/resources/datasetDocuments.json"));
-        for(Object o : a) {
-            System.out.println(o);
-        }*/
-
-        //JSON parser object to parse read file
-        //JSONParser jsonParser = new JSONParser();
-
-        /*try (FileReader reader = new FileReader("./src/main/resources/datasetDocuments.json"))
-        {
-            //Read JSON file
-            Object obj = jsonParser.parse(reader);
-
-            JSONArray employeeList = (JSONArray) obj;
-            System.out.println(employeeList);
-
-            //Iterate over employee array
-            employeeList.forEach( emp -> parseEmployeeObject( (JSONObject) emp ) );
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-*/
         return documents;
     }
 
@@ -160,6 +130,39 @@ public class JsonReader {
         return queries;
     }
 
+    public static ArrayList<ArrayList<Query>> parseJsonFileConsonants(String path) throws IOException, ParseException {
+
+        String title;
+
+        ArrayList<ArrayList<Query>> allConsonantQueries = new ArrayList<>();
+        ArrayList<Query> consonantsList = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+        Object jsonData  = parser.parse(new FileReader(path));
+        JSONArray jsonConsonants = (JSONArray) ((JSONObject) jsonData).get("Consonants");
+        //System.out.println(jsonConsonants);
+        for(Object consonantObj : jsonConsonants) {
+//            System.out.println(consonantObj);
+            JSONArray Words = (JSONArray) ((JSONObject) consonantObj).get("Words");
+            for(Object word : Words) {
+
+                Iterator<String> keys = ((JSONObject) word).keySet().iterator();
+                consonantsList = new ArrayList<>();
+                while(keys.hasNext()) {
+                    String key = keys.next();
+
+                    Query query = new Query();
+                    query.setQuery(((JSONObject) word).get(key).toString().trim());
+                    consonantsList.add(query);
+                    System.out.println(((JSONObject) word).get(key));
+                }
+                allConsonantQueries.add(consonantsList);
+            }
+
+        }
+        return allConsonantQueries;
+    }
+
     private static Integer getTokenValue(String token) {
         String[] result = token.split("=");
         String valueToken = result[1];
@@ -170,12 +173,19 @@ public class JsonReader {
     }
 
     public static void main(String[] args) throws IOException, ParseException {
-        parseJsonStopwords("./src/main/resources/el-stopwords.json");
+/*        parseJsonStopwords("./src/main/resources/el-stopwords.json");
         for(Document Doc : parseJsonFileDocuments("./src/main/resources/dataset.json")) {
             System.out.println("{" + Doc.getID() + "," + Doc.getTitle() + "," + Doc.getBody() + "}");
         }
         for(Query q: parseJsonFileQueries("src/main/resources/dataset.json")) {
             System.out.println("{" + q.getID() + "," + q.getQuery() + "," + q.getHashMap()+ "}");
+        }*/
+        for(ArrayList<Query> listQ : parseJsonFileConsonants("./src/main/resources/consonants.json")) {
+            System.out.print("{");
+            for(Query q: listQ) {
+                System.out.print(" "+q.getQuery());
+            }
+            System.out.println("}");
         }
     }
 }
