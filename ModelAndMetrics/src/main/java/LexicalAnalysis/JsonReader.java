@@ -131,21 +131,15 @@ public class JsonReader {
     }
 
     public static ArrayList<ArrayList<Query>> parseJsonFileConsonants(String path) throws IOException, ParseException {
-
-        String title;
-
         ArrayList<ArrayList<Query>> allConsonantQueries = new ArrayList<>();
-        ArrayList<Query> consonantsList = new ArrayList<>();
+        ArrayList<Query> consonantsList;
 
         JSONParser parser = new JSONParser();
         Object jsonData  = parser.parse(new FileReader(path));
         JSONArray jsonConsonants = (JSONArray) ((JSONObject) jsonData).get("Consonants");
-        //System.out.println(jsonConsonants);
         for(Object consonantObj : jsonConsonants) {
-//            System.out.println(consonantObj);
             JSONArray Words = (JSONArray) ((JSONObject) consonantObj).get("Words");
             for(Object word : Words) {
-
                 Iterator<String> keys = ((JSONObject) word).keySet().iterator();
                 consonantsList = new ArrayList<>();
                 while(keys.hasNext()) {
@@ -154,11 +148,9 @@ public class JsonReader {
                     Query query = new Query();
                     query.setQuery(((JSONObject) word).get(key).toString().trim());
                     consonantsList.add(query);
-                    System.out.println(((JSONObject) word).get(key));
                 }
                 allConsonantQueries.add(consonantsList);
             }
-
         }
         return allConsonantQueries;
     }
