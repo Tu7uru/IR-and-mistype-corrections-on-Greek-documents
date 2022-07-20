@@ -130,9 +130,9 @@ public class JsonReader {
         return queries;
     }
 
-    public static ArrayList<ArrayList<Query>> parseJsonFileConsonants(String path) throws IOException, ParseException {
-        ArrayList<ArrayList<Query>> allConsonantQueries = new ArrayList<>();
-        ArrayList<Query> consonantsList;
+    public static ArrayList<ArrayList<String>> parseJsonFileConsonants(String path) throws IOException, ParseException {
+        ArrayList<ArrayList<String>> allConsonantQueries = new ArrayList<>();
+        ArrayList<String> consonantsList;
 
         JSONParser parser = new JSONParser();
         Object jsonData  = parser.parse(new FileReader(path));
@@ -145,9 +145,9 @@ public class JsonReader {
                 while(keys.hasNext()) {
                     String key = keys.next();
 
-                    Query query = new Query();
-                    query.setQuery(((JSONObject) word).get(key).toString().trim());
-                    consonantsList.add(query);
+                    //Query query = new Query();
+                    //query.setQuery(((JSONObject) word).get(key).toString().trim());
+                    consonantsList.add(((JSONObject) word).get(key).toString().trim());
                 }
                 allConsonantQueries.add(consonantsList);
             }
@@ -172,10 +172,10 @@ public class JsonReader {
         for(Query q: parseJsonFileQueries("src/main/resources/dataset.json")) {
             System.out.println("{" + q.getID() + "," + q.getQuery() + "," + q.getHashMap()+ "}");
         }*/
-        for(ArrayList<Query> listQ : parseJsonFileConsonants("./src/main/resources/consonants.json")) {
+        for(ArrayList<String> listQ : parseJsonFileConsonants("./src/main/resources/consonants.json")) {
             System.out.print("{");
-            for(Query q: listQ) {
-                System.out.print(" "+q.getQuery());
+            for(String query: listQ) {
+                System.out.print(" "+query);
             }
             System.out.println("}");
         }
