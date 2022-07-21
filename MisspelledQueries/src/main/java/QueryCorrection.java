@@ -328,11 +328,11 @@ public class QueryCorrection {
     /**
      *
      * @param validQueriesAndEditDistance : the list of queries that were marked as valid based on the distance from the query given(minimum distance)
-     * @param query : The query that is being corrected/tested
+     * @param initialQuery : The query that is being corrected/tested
      * @param keyboardDistance : keyboard distance to check(1 or 2)
      * @return should be a sorted list of the queries based on the relativity with the query given()
      */
-    public static String KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String query,Integer keyboardDistance) {
+    public static String KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery,Integer keyboardDistance) {
 
         /*
             if query length is greater than valid query length then use LCS
@@ -349,6 +349,7 @@ copy from valid str to find if letter has ί ?
         int tmpExpectedLetterIndex;
         //Boolean foundCorrectAdjacent;
         String correctString = "";
+        String query;
 
         String paddedQuery = "";
         String paddedValidQuery = "";
@@ -356,7 +357,7 @@ copy from valid str to find if letter has ί ?
         for(Pair<String,Integer> validQueryPair : validQueriesAndEditDistance) {
 
             correctString = "";
-
+            query = initialQuery;
             String validQuery = validQueryPair.left;
             currentQueryEditDistance = validQueryPair.right;
             improvedStringEditDistance = -1; // initial value, it does not mean anything at the start - will always be the minimum value
