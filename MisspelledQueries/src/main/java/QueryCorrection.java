@@ -83,10 +83,13 @@ public class QueryCorrection {
         Some Sources on fat-fingering : https://datagenetics.com/blog/november42012/index.html
      */
 
-    /*
-        This function a letter and finds the row,column and if it is upper case character
-
-        Note: 4 rows ,10~13 columns(see greekKeyboardLayout array)
+    /**
+     * This function a letter and finds the row,column and if it is upper case character
+     *
+     * Note: 4 rows ,10~13 columns(see greekKeyboardLayout array)
+     *
+     * @param letter a letter that can be found on the keyboard(greek layout)
+     * @return the Row,Column  on the keyboard(see keyboardLayout) and if it is uppercase
      */
     public static Triplet GetRowColumnAndUpper(char letter) {
         for(int row = 0; row < greekKeyboardLayout.length;row++){
@@ -103,6 +106,12 @@ public class QueryCorrection {
         return null;
     }
 
+    /**
+     * Removes Accentuation from the character given as input
+     *
+     * @param input the character to remove accentuation
+     * @return the character without accentuation
+     */
     public static Character RemoveAccentuations(char input) {
         for(char[] row : greekVowelAccentuation) {
             for(char letter : row) {
@@ -297,11 +306,16 @@ public class QueryCorrection {
         return input;
     }
 
-
-    public static ArrayList<Character> findPossibleSurroundingLetters(){
-        return null;
-    }
-
+    /**
+     * This function takes the adjacent characters from a character in the keyboard and based on the currently investigated
+     * index in the validQuery it searches which character is the most expected to be returned(this is incase one character
+     * maps to more than one keys that decrease the edit distance)
+     *
+     * @param adjacentCharacters List of adjacent characters(from some character in the keyboard layout)
+     * @param validQuery the query that is syntactically correct
+     * @param expectedIndex the index in the validQuery that is currently being searched(for keyboard distance error)
+     * @return the index that is most expected to reduce the edit distance on the following steps
+     */
     public static int FindMostExpectedAdjacent(ArrayList<Character> adjacentCharacters,String validQuery,int expectedIndex ) {
         char mostExpected = 0;
         int mostExpectedIndex = -1;
@@ -326,11 +340,12 @@ public class QueryCorrection {
     }
 
     /**
+     * Takes a misspelled query and a list of valid queries
      *
-     * @param validQueriesAndEditDistance : the list of queries that were marked as valid based on the distance from the query given(minimum distance)
-     * @param initialQuery : The query that is being corrected/tested
+     * @param validQueriesAndEditDistance : the list of queries and their respective Edit Distance that were marked as valid and were given to investigate
+     * @param initialQuery : The misspelled query that is being corrected
      * @param keyboardDistance : keyboard distance to check(1 or 2)
-     * @return should be a sorted list of the queries based on the relativity with the query given()
+     * @return A sorted list of the queries based on the NEW Edit Distance after applying keyboard miss-type correction
      */
     public static String KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery,Integer keyboardDistance) {
 
@@ -550,7 +565,7 @@ copy from valid str to find if letter has ί ?
 
         //validQs.add("βάζω");
         //validQs.add("βάζο");
-        validQs.add(new Pair("αίτημα",7));
+        validQs.add(new Pair("αίτημα",8));
         //validQs.add("ετοιμα");
 
         //αοτοιμα;
@@ -563,7 +578,7 @@ copy from valid str to find if letter has ί ?
 
         //System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
-        System.out.println(KeyboardDistance(validQs,"αοοουυοιμα",1));
+        System.out.println(KeyboardDistance(validQs,"αοοοξυυοιμα",1));
 
         //System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
