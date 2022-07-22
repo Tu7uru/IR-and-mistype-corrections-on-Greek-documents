@@ -123,6 +123,12 @@ public class QueryCorrection {
         return input;
     }
 
+    /**
+     *
+     * @param incorrectCharacter character input(expected to exist on keynoard of type QWERTY)
+     * @param distance distance to check - 1 or 2(some surrounding letters have higher by 1cm distance)
+     * @return All surrounding letters according to distance 1 or 2
+     */
     public static ArrayList<Character> GetSurroundingCharacters(Character incorrectCharacter,Integer distance) {
         int row,col,upper;
         ArrayList<Character> surroundingCharacters = new ArrayList<>();
@@ -344,15 +350,13 @@ public class QueryCorrection {
      *
      * @param validQueriesAndEditDistance : the list of queries and their respective Edit Distance that were marked as valid and were given to investigate
      * @param initialQuery : The misspelled query that is being corrected
-     * @param keyboardDistance : keyboard distance to check(1 or 2)
      * @return A list of (ValidQuery,Corrected_Query,KeyboardDistance) entries which are the given query modified to be closer to each respective validQuery.For each of these,keyboard distance is also stored.
      */
-    public static ArrayList<Triplet> KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery,Integer keyboardDistance) {
+    public static ArrayList<Triplet> KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
 
         /*
             if query length is greater than valid query length then use LCS
 αοοουημα -> αίουημα -> αίοτημα
-copy from valid str to find if letter has ί ?
          */
         ArrayList<Triplet> results = new ArrayList<>();
         //if same length as valid
@@ -363,7 +367,6 @@ copy from valid str to find if letter has ί ?
 
         int expectedLetterIndex;
         int tmpExpectedLetterIndex;
-        //Boolean foundCorrectAdjacent;
         String correctString = "";
         String query;
 
@@ -378,7 +381,7 @@ copy from valid str to find if letter has ί ?
             query = initialQuery;
             String validQuery = validQueryPair.left;
             currentQueryEditDistance = validQueryPair.right;
-            improvedStringEditDistance = -1; // initial value, it does not mean anything at the start - will always be the minimum value
+            //improvedStringEditDistance = -1; // initial value, it does not mean anything at the start - will always be the minimum value
 
             if(query.length() < validQuery.length()) {
                 length = validQuery.length();
@@ -407,15 +410,15 @@ copy from valid str to find if letter has ί ?
                     char adjacentCharacter = paddedValidQuery.charAt(expectedLetterIndex);
                     //for(char adjacentCharacter: surroundingCharacters) {
                         String updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
-                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
+//                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
                         //if(adjacentCharacter == RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex))) {
                         //    System.out.println("eq but diff" + updatedString.charAt(i) + " padQ: " + paddedValidQuery.charAt(expectedLetterIndex) );
                         //    updatedString = TransformToMisspelledQueries.replaceChar(updatedString,paddedValidQuery.charAt(expectedLetterIndex),i);
                         //}
                         updatedQueryEditDistance = EditDistance.calculate(validQuery,updatedString);
-                        System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance + " improved d" + improvedStringEditDistance);
+//                        System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance );//+ " improved d" + improvedStringEditDistance);
                         if(updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
-                            System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
+//                            System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
                             correctString = updatedString;
                             query = updatedString;
                             //improvedStringEditDistance = updatedStringEditDistance;
@@ -490,105 +493,7 @@ copy from valid str to find if letter has ί ?
         String tmp1 = "βάζχ";
         String tmp2 = "βαωζ";
 
-
         char[][][] kLay = GetGreekKeyboardLayout();
-
-        /*
-            Test - for each possible character find  column,row and upper case
-
-            Function to test: FindRowColumnAndUpper
-
-            Results: Correct
-        */
-
-        /*for(char[][] row : kLay) {
-            for(char[] cell : row) {
-                for(char character: cell) {
-                    Triplet res = FindRowColumnAndUpper(character);
-                    System.out.println("char '" + character + "':" + res.getRow() + ", "+ res.getCol() +", "+res.getUpperCase());
-                }
-            }
-        }*/
-
-        /*
-            Test - for each possible character find surrounding keys at distance 1(or 2)
-
-            Function to test: GetSurroundingCharacters
-
-            Results: Correct for distance 1 and 2
-        */
-        /*for (int i = 1; i <= 2; i++) {
-            System.out.println("DISTANCE :" + i);
-            for (char[][] row : kLay) {
-                for (char[] cell : row) {
-                    if (cell != null) {
-                        //System.out.println(cell);
-                        for (char character : cell) {
-                            ArrayList<Character> res = GetSurroundingCharacters(character, i);
-                            System.out.println("surroundings of " + character + ":" + res);
-                        }
-                    }
-                }
-            }
-        }*/
-
-        /*
-            Remove Accentuations testing
-
-            Function to test - RemoveAccentuations
-
-            Result: Correct
-         */
-
-        /*for (char[] row : GetGreekVowelAccentuations()) {
-            for(char letter : row) {
-                System.out.println(RemoveAccentuations(letter));
-            }
-        }*/
-
-        /*
-            test - String padding on the right
-
-            worked
-         */
-        /*String x = "βαζ";
-
-        System.out.println("pad:" + PadString(x,3) + " | x: "+ x);
-        */
-
-        /*
-            Test - Load Consonants and convert to misspelled queries
-
-         */
-        //ArrayList<ArrayList<String>> consonants = JsonReader.parseJsonFileConsonants();
-
-        /*
-            Test- Finding correct Word on keyboard distance or finding any correction based on keyboard error
-         */
-        FindMostExpectedAdjacent(GetSurroundingCharacters('υ', 1),"αίτημα",1);
-        ArrayList<Pair<String,Integer>> validQs = new ArrayList<>();
-        ArrayList<Pair<String,Integer>> validQs2 = new ArrayList<>();
-
-        //validQs.add("βάζω");
-        //validQs.add("βάζο");
-        validQs.add(new Pair("αίτημα",7));
-        //validQs.add("ετοιμα");
-
-        //αοτοιμα;
-        //ετοιμα 2;
-        //εοτοιμα 1;
-
-
-        //validQs2.add("βάζο");
-        //validQs2.add("βάζω");
-
-        //System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
-        //System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
-        String initialQuery = "αοοουυοιμα";
-        Triplet trip = KeyboardDistance(validQs,initialQuery,1).get(0);
-        System.out.println("correct: " + trip.getLeft() + " initial:" + initialQuery + " final: " + trip.getMid() + " old distance: "+ validQs.get(0).right +" keyboard distance:" + trip.getRight());
-
-        //System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
-        //System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
+        
     }
 }
