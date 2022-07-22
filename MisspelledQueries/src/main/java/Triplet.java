@@ -1,23 +1,23 @@
-public class Triplet {
-        public final Integer row;
-        public final Integer col;
-        public final Integer upperCase;
+public class Triplet<L, M, R>  {
+    private final L left;
+    private final M mid;
+    private final R right;
 
-        public Triplet(Integer row, Integer col,Integer upperCase) {
-            this.row= row;
-            this.col= col;
-            this.upperCase = upperCase;
-        }
-
-    public Integer getCol() {
-        return col;
+    public Triplet(L left, M mid,R right) {
+        this.left= left;
+        this.mid= mid;
+        this.right = right;
     }
 
-    public Integer getRow() {
-        return row;
+    public L getLeft() {
+        return left;
     }
 
-    public Integer getUpperCase() {
-        return upperCase;
+    public M getMid() {
+        return mid;
+    }
+
+    public R getRight() {
+        return right;
     }
 }
