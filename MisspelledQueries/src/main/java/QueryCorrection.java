@@ -91,14 +91,14 @@ public class QueryCorrection {
      * @param letter a letter that can be found on the keyboard(greek layout)
      * @return the Row,Column  on the keyboard(see keyboardLayout) and if it is uppercase
      */
-    public static Triplet GetRowColumnAndUpper(char letter) {
+    public static KeyboardLayoutCoordinates GetRowColumnAndUpper(char letter) {
         for(int row = 0; row < greekKeyboardLayout.length;row++){
             for(int col = 0; col < greekKeyboardLayout[row].length;col++) {
                 if(greekKeyboardLayout[row][col] != null) {
                     if (greekKeyboardLayout[row][col][0] == letter) {
-                        return new Triplet(row, col, 0);
+                        return new KeyboardLayoutCoordinates(row, col, 0);
                     } else if (greekKeyboardLayout[row][col][1] == letter) {
-                        return new Triplet(row, col, 1);
+                        return new KeyboardLayoutCoordinates(row, col, 1);
                     }
                 }
             }
@@ -126,7 +126,7 @@ public class QueryCorrection {
     public static ArrayList<Character> GetSurroundingCharacters(Character incorrectCharacter,Integer distance) {
         int row,col,upper;
         ArrayList<Character> surroundingCharacters = new ArrayList<>();
-        Triplet characterPosition = GetRowColumnAndUpper(incorrectCharacter);
+        KeyboardLayoutCoordinates characterPosition = GetRowColumnAndUpper(incorrectCharacter);
         row = characterPosition.getRow();
         col = characterPosition.getCol();
         upper = characterPosition.getUpperCase();
@@ -345,18 +345,19 @@ public class QueryCorrection {
      * @param validQueriesAndEditDistance : the list of queries and their respective Edit Distance that were marked as valid and were given to investigate
      * @param initialQuery : The misspelled query that is being corrected
      * @param keyboardDistance : keyboard distance to check(1 or 2)
-     * @return A sorted list of the queries based on the NEW Edit Distance after applying keyboard miss-type correction
+     * @return A list of (ValidQuery,Corrected_Query,KeyboardDistance) entries which are the given query modified to be closer to each respective validQuery.For each of these,keyboard distance is also stored.
      */
-    public static String KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery,Integer keyboardDistance) {
+    public static ArrayList<Triplet> KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery,Integer keyboardDistance) {
 
         /*
             if query length is greater than valid query length then use LCS
 αοοουημα -> αίουημα -> αίοτημα
 copy from valid str to find if letter has ί ?
          */
+        ArrayList<Triplet> results = new ArrayList<>();
         //if same length as valid
         int length;
-        int currentQueryEditDistance;
+        int currentQueryEditDistance = -1;
         int updatedQueryEditDistance = 100;
         int improvedStringEditDistance = 100;
 
@@ -370,6 +371,8 @@ copy from valid str to find if letter has ί ?
         String paddedValidQuery = "";
 
         for(Pair<String,Integer> validQueryPair : validQueriesAndEditDistance) {
+
+            Triplet result = new Triplet();
 
             correctString = "";
             query = initialQuery;
@@ -432,7 +435,10 @@ copy from valid str to find if letter has ί ?
                     continue;
                 }
             }
-
+            result.setLeft(validQueryPair.left);
+            result.setMid(correctString);
+            result.setRight(validQueryPair.right - currentQueryEditDistance);
+            results.add(result);
 
 //            expectedLetterIndex = 0;
 //            for(int i = 0; i < length; i++) {
@@ -477,7 +483,7 @@ copy from valid str to find if letter has ί ?
 
             if transposition then keyboard error offers nothing
         */
-        return correctString;
+        return results;
     }
 
     public static void main(String[] args) {
@@ -565,7 +571,7 @@ copy from valid str to find if letter has ί ?
 
         //validQs.add("βάζω");
         //validQs.add("βάζο");
-        validQs.add(new Pair("αίτημα",8));
+        validQs.add(new Pair("αίτημα",7));
         //validQs.add("ετοιμα");
 
         //αοτοιμα;
@@ -578,7 +584,9 @@ copy from valid str to find if letter has ί ?
 
         //System.out.println(KeyboardDistance(validQs,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs,"νάσκ",1,3));
-        System.out.println(KeyboardDistance(validQs,"αοοοξυυοιμα",1));
+        String initialQuery = "αοοουυοιμα";
+        Triplet trip = KeyboardDistance(validQs,initialQuery,1).get(0);
+        System.out.println("correct: " + trip.getLeft() + " initial:" + initialQuery + " final: " + trip.getMid() + " old distance: "+ validQs.get(0).right +" keyboard distance:" + trip.getRight());
 
         //System.out.println(KeyboardDistance(validQs2,"νάσψ",1,3));
         //System.out.println(KeyboardDistance(validQs2,"νάσκ",1,3));
