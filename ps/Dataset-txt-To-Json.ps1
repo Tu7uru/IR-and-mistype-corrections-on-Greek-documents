@@ -16,6 +16,7 @@ foreach($entry in $json ) {
         $docPosition = 0
 
         if($firstEntry -eq 0) {
+            #$relevantDocs = $relevantDocs | ConvertTo-json -Depth 2
             $newQuery.RelevantDocs = $relevantDocs
             $queries += $newQuery
         }
@@ -62,3 +63,6 @@ $datasetToJson = [PSCustomObject]@{
 $datasetToJson += $queries
 $datasetToJson += $docs
 $datasetToJson | ConvertTo-Json -Depth 3 | Out-File "..\dataset\dataset.json" -Encoding utf8 -Force
+
+#$json = Get-Content -Path "..\dataset\dataset.json" -Encoding UTF8 | ConvertFrom-Json
+#$json.Documents | ConvertTo-Json -Depth 3 | Out-File "..\dataset\datasetDocuments.json" -Encoding utf8 -Force
