@@ -122,7 +122,7 @@ public class KeyboardErrorCorrectionTesting {
      * @param initialQuery the query that is corrected(possible input from a user).
      */
     public static void TestKeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
-        ArrayList<Triplet> trips = QueryCorrection.CorrectKeyboardMissType(validQueriesAndEditDistance, initialQuery);
+        ArrayList<Triplet> trips = QueryCorrection.CorrectKeyboardMisType(validQueriesAndEditDistance, initialQuery);
         int index = 0;
         for (Triplet trip : trips) {
 //            System.out.println("correct: " + trip.getLeft() + " initial:" + initialQuery + " final: " + trip.getMid() + " old distance: " + validQueriesAndEditDistance.get(index).right + " new distance: " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
@@ -163,7 +163,7 @@ public class KeyboardErrorCorrectionTesting {
                 }
                 //System.out.println(ListOfQueriesAndEditDistance);
                 //for (listIndex = 0; listIndex < misspelledConsonants.size(); listIndex++) {
-                    ArrayList<Triplet> results = QueryCorrection.CorrectKeyboardMissType(ListOfQueriesAndEditDistance, misspelledConsonants.get(misspelledIndex));
+                    ArrayList<Triplet> results = QueryCorrection.CorrectKeyboardMisType(ListOfQueriesAndEditDistance, misspelledConsonants.get(misspelledIndex));
                     listIndex = 0;
                     for (Triplet trip : results) {
                         System.out.println("correct: " + trip.getLeft() + " initial:" + misspelledConsonants.get(misspelledIndex) + " final: " + trip.getMid() + " old distance: " + ListOfQueriesAndEditDistance.get(listIndex).right + " new distance: " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
@@ -232,16 +232,14 @@ public class KeyboardErrorCorrectionTesting {
 //        validQs.add(new Pair("μαδώ",4));
 //        TestKeyboardDistance(validQs,"νσχβ");
         
-        validQs.add(new Pair("βάζω",4));
-        TestKeyboardDistance(validQs,"νσχβ");
-
-        //EOF 4 words
-//        validQs.add(new Pair("βάζο",4));
+//        validQs.add(new Pair("βάζω",4));
 //        TestKeyboardDistance(validQs,"νσχβ");
 
 
+//        validQs.add(new Pair("βάζο",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+        //EOF 4 words
 
-
-//        TestKeyboardDistanceBulk("src/main/resources/consonants.json");
+        TestKeyboardDistanceBulk("src/main/resources/consonants.json");
     }
 }
