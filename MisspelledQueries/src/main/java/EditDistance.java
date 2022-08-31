@@ -39,5 +39,6 @@ public class EditDistance {
         System.out.println(EditDistance.calculate("κάρδαμο","καρδμο"));
         System.out.println(EditDistance.calculate("κάρδαμο","κάρδμο"));
         System.out.println(EditDistance.calculate("κάρδαμο","κάρδαμο"));
+        System.out.println(EditDistance.calculate("αιτημα","αοοοτοιμα"));
     }
 }
