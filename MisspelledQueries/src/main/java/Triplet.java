@@ -1,7 +1,10 @@
 public class Triplet<L, M, R>  {
-    private final L left;
-    private final M mid;
-    private final R right;
+    private L left;
+    private M mid;
+    private R right;
+
+    public Triplet() {
+    }
 
     public Triplet(L left, M mid,R right) {
         this.left= left;
@@ -19,5 +22,17 @@ public class Triplet<L, M, R>  {
 
     public R getRight() {
         return right;
+    }
+
+    public void setLeft(L left) {
+        this.left = left;
+    }
+
+    public void setMid(M mid) {
+        this.mid = mid ;
+    }
+
+    public void setRight(R right) {
+        this.right = right;
     }
 }
