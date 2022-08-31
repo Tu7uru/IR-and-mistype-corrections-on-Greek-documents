@@ -1,4 +1,5 @@
 import LexicalAnalysis.JsonReader;
+import Model.Query;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -110,8 +111,8 @@ public class KeyboardErrorCorrectionTesting {
      * @param validQuery the correct query to compare characters
      * @param currentlyExpectedIndex Valid Query currently expected index is a letter that has the priority if more than one characters can fit the spot
      */
-    public static void TestFindMostExpectedAdjacent(char character,int AtDistance,String validQuery,int currentlyExpectedIndex) {
-        System.out.println(QueryCorrection.FindMostExpectedAdjacent(QueryCorrection.GetSurroundingCharacters(character, AtDistance),validQuery,currentlyExpectedIndex));
+    public static void TestFindMostExpectedAdjacent(char character,int AtDistance,String validQuery,int currentlyExpectedIndex, int maxIndex) {
+        System.out.println(QueryCorrection.FindMostExpectedAdjacent(QueryCorrection.GetSurroundingCharacters(character, AtDistance),validQuery,currentlyExpectedIndex, maxIndex,1));
     }
 
     /**
@@ -120,9 +121,15 @@ public class KeyboardErrorCorrectionTesting {
      * @param validQueriesAndEditDistance a list of pairs that contain the valid query(left side) and the edit distance(right) that the initialQuery(second param) has from that valid query
      * @param initialQuery the query that is corrected(possible input from a user).
      */
-    public static void TestKeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/){
-        Triplet trip = QueryCorrection.KeyboardDistance(validQueriesAndEditDistance,initialQuery).get(0);
-        System.out.println("correct: " + trip.getLeft() + " initial:" + initialQuery + " final: " + trip.getMid() + " old distance: "+ validQueriesAndEditDistance.get(0).right + " new distance: " + EditDistance.calculate((String)trip.getLeft(),(String)trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
+    public static void TestKeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
+        ArrayList<Triplet> trips = QueryCorrection.CorrectKeyboardMissType(validQueriesAndEditDistance, initialQuery);
+        int index = 0;
+        for (Triplet trip : trips) {
+//            System.out.println("correct: " + trip.getLeft() + " initial:" + initialQuery + " final: " + trip.getMid() + " old distance: " + validQueriesAndEditDistance.get(index).right + " new distance: " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
+            System.out.println( "\\selectlanguage{greek}" + trip.getLeft() + " & \\selectlanguage{greek}" + initialQuery + " & \\selectlanguage{greek}" + trip.getMid() +  " & " + validQueriesAndEditDistance.get(index).right  + " & " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " \\\\");
+            System.out.println("\\hline");
+            index++;
+        }
     }
 
     /**
@@ -131,8 +138,43 @@ public class KeyboardErrorCorrectionTesting {
      *
      * @param path path to consonants file
      */
-    public static void TestKeyboardDistanceBulk(String path) {
+    public static void TestKeyboardDistanceBulk(String path) throws IOException, ParseException {
+        ArrayList<String> misspelledConsonants = new ArrayList<>();
 
+        ArrayList<ArrayList<String>> consonants = JsonReader.parseJsonFileConsonants(path);
+        System.out.println(consonants.size());
+        for(ArrayList<String> consonantList : consonants) {
+            misspelledConsonants = TransformToMisspelledQueries.IncorrectSurroundingCharacter(consonantList);
+
+            int listIndex = 0;
+            int misspelledIndex = 0;
+//            ArrayList<Pair<String,Integer>> ListOfQueriesAndEditDistance = new ArrayList<>();
+            for( misspelledIndex = 0; misspelledIndex < misspelledConsonants.size(); misspelledIndex++) {
+                ArrayList<Pair<String,Integer>> ListOfQueriesAndEditDistance = new ArrayList<>();
+                for (listIndex = 0; listIndex < misspelledConsonants.size(); listIndex++) {
+                    String misspelledQuery = misspelledConsonants.get(misspelledIndex);
+                    String validQuery = consonantList.get(listIndex);
+//                    System.out.println(misspelledQuery);
+//                    System.out.println(validQuery);
+                    int editDistance = EditDistance.calculate(validQuery, misspelledQuery);
+//                    System.out.println(editDistance);
+                    Pair<String, Integer> ValQuery_EditDistance = new Pair(validQuery, editDistance);
+                    ListOfQueriesAndEditDistance.add(ValQuery_EditDistance);
+                }
+                //System.out.println(ListOfQueriesAndEditDistance);
+                //for (listIndex = 0; listIndex < misspelledConsonants.size(); listIndex++) {
+                    ArrayList<Triplet> results = QueryCorrection.CorrectKeyboardMissType(ListOfQueriesAndEditDistance, misspelledConsonants.get(misspelledIndex));
+                    listIndex = 0;
+                    for (Triplet trip : results) {
+                        System.out.println("correct: " + trip.getLeft() + " initial:" + misspelledConsonants.get(misspelledIndex) + " final: " + trip.getMid() + " old distance: " + ListOfQueriesAndEditDistance.get(listIndex).right + " new distance: " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
+//                        System.out.println( "\\selectlanguage{greek}" + trip.getLeft() + " & \\selectlanguage{greek}" + misspelledConsonants.get(misspelledIndex) + " & \\selectlanguage{greek}" + trip.getMid() +  " & " + ListOfQueriesAndEditDistance.get(listIndex).right  + " & " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " \\\\");
+//                        System.out.println("\\hline");
+                        listIndex++;
+                    }
+               // }
+            }
+
+        }
     }
 
     public static void main(String[] args) throws IOException, ParseException {
@@ -142,9 +184,64 @@ public class KeyboardErrorCorrectionTesting {
 //        TestStringPadding("βαζ",3);
 //        TestLoadConsonants("src/main/resources/consonants.json");
 //        TestFindMostExpectedAdjacent('υ',1,"αίτημα",1);
-/*        ArrayList<Pair<String,Integer>> validQs = new ArrayList<>();
-        validQs.add(new Pair("αίτημα",7));
-        TestKeyboardDistance(validQs,"αοοουυοιμα");
- */
+
+        ArrayList<Pair<String,Integer>> validQs = new ArrayList<>();
+//        validQs.add(new Pair("έτοιμα",4));
+//        validQs.add(new Pair("ακώλυτος",4));
+//        validQs.add(new Pair("ακόλλητος",3));
+//        TestKeyboardDistance(validQs,"ακόλλητπς");
+//        TestKeyboardDistance(validQs,"αοοοόλλητος");
+//        TestKeyboardDistance(validQs,"αιώλυτος");
+
+        // Testing specific words
+
+//validQs.add(new Pair("ακόλλητος",3));
+//        TestKeyboardDistance(validQs,"αοοοόλλητος");
+
+
+//        validQs.add(new Pair("αίτημα",4));
+//        TestKeyboardDistance(validQs,"αοοουημα");
+
+//        validQs.add(new Pair("ακόλλητος",5));
+//        TestKeyboardDistance(validQs,"αοοοόλοηυος");
+
+//        validQs.add(new Pair("ακόλλητος",2));
+//        TestKeyboardDistance(validQs,"ακλλυτος");
+
+//        validQs.add(new Pair("βάζω",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+
+//        validQs.add(new Pair("ισχύ",2));
+//        TestKeyboardDistance(validQs,"νσχβ");
+
+
+//        validQs.add(new Pair("αίτημα",3));
+//        TestKeyboardDistance(validQs,"απλότημα");
+
+//        validQs.add(new Pair("απλότητα",1));
+//        TestKeyboardDistance(validQs,"απλότημα");
+
+        //These are the 4 words from the report
+//        validQs.add(new Pair("μέση",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+
+        //These are the 4 words
+//        validQs.add(new Pair("μάχη",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+
+//        validQs.add(new Pair("μαδώ",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+        
+        validQs.add(new Pair("βάζω",4));
+        TestKeyboardDistance(validQs,"νσχβ");
+
+        //EOF 4 words
+//        validQs.add(new Pair("βάζο",4));
+//        TestKeyboardDistance(validQs,"νσχβ");
+
+
+
+
+//        TestKeyboardDistanceBulk("src/main/resources/consonants.json");
     }
 }
