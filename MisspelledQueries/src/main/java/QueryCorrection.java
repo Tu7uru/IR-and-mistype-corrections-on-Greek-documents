@@ -43,17 +43,17 @@ public class QueryCorrection {
               Which one though?If we consider that 'χ' is closer to 'ω' than 'ο' we could assume
               that the relevant word is "βάζω" instead of "βάζο".
 
-        This idea only works for similar words(homophones) that are written differently and have the same edit distance.
+        This idea only works for similar words(homophones/consonants) that are written differently and have the same edit distance.
         For this reason we need to break down misspelled queries cases and see how they would be handled theoretically
 
         βαζχ :
                 deletion: not relevant with miss-typed character
-                          - add character
+                          - the algorithm does not do well with these cases
                 addition: not relevant with miss-typed character
                           should check if removal of the extra character reduces edit distance
                           or make sure not to investigate extra character
-                transposition*: should be checked if transposition exists before checking for miss-typed characters on keyboard
-                incorrectCharacter: should be checked with edit distance and then find which character is more relevant based on keyboard layout
+                transposition*: it is not checked since it has nothing to do with substitutions
+                substitution: should be checked with edit distance and then find which character is more relevant based on keyboard layout
                                     Note: Could also take into consideration that it might be TYPO(same character 'ι','η' but incorrectly typed)
 
         *transposition:
@@ -132,10 +132,16 @@ public class QueryCorrection {
     public static ArrayList<Character> GetSurroundingCharacters(Character incorrectCharacter,Integer distance) {
         int row,col,upper;
         ArrayList<Character> surroundingCharacters = new ArrayList<>();
-        KeyboardLayoutCoordinates characterPosition = GetRowColumnAndUpper(incorrectCharacter);
+        KeyboardLayoutCoordinates characterPosition = GetRowColumnAndUpper(RemoveAccentuations(incorrectCharacter));
+        //System.out.println(incorrectCharacter);
         row = characterPosition.getRow();
         col = characterPosition.getCol();
         upper = characterPosition.getUpperCase();
+
+        if(row == -1) {
+            //System.out.println("in");
+            return null;
+        }
         int MAX_LEFT_COL,LAST_RIGHT_COL,MAX_UP_ROW,MAX_DOWN_ROW;
 
         /*
@@ -322,21 +328,23 @@ public class QueryCorrection {
      * @param expectedIndex the index in the validQuery that is currently being searched(for keyboard distance error)
      * @return the index that is most expected to reduce the edit distance on the following steps
      */
-    public static int FindMostExpectedAdjacent(ArrayList<Character> adjacentCharacters,String validQuery,int expectedIndex ) {
-        char mostExpected = 0;
+    public static int FindMostExpectedAdjacent(ArrayList<Character> adjacentCharacters,String validQuery,int expectedIndex, int maxIndex, int depth) {
         int mostExpectedIndex = -1;
 
         for(char adjacent : adjacentCharacters) {
 //            System.out.println(adjacent);
-            for(int i = expectedIndex; i < validQuery.length(); i++) {
-                //System.out.println("vald: " + RemoveAccentuations(validQuery.charAt(i)) + " adj " + adjacent);
-                //System.out.println(RemoveAccentuations(validQuery.charAt(i)) == adjacent);
+            for(int i = expectedIndex; i <= maxIndex; i++) {
+//                System.out.println("vald: " + RemoveAccentuations(validQuery.charAt(i)) + " adj " + adjacent);
+//                System.out.println(RemoveAccentuations(validQuery.charAt(i)) == adjacent);
                 if(RemoveAccentuations(validQuery.charAt(i)) == adjacent) {
-                    //System.out.println(RemoveAccentuations(validQuery.charAt(i)) == adjacent);
+//                    System.out.println(RemoveAccentuations(validQuery.charAt(i)) == adjacent);
                     if(i < mostExpectedIndex || mostExpectedIndex == -1) {
-                        mostExpected = validQuery.charAt(i);
+                        if(depth != 0) {
+                            depth--;
+                            continue;
+                        }
                         mostExpectedIndex = i;
-                        //System.out.println("ZZZZZZ" + validQuery.charAt(i));
+//                        System.out.println("ZZZZZZ" + validQuery.charAt(i));
                     }
                 }
             }
@@ -352,7 +360,7 @@ public class QueryCorrection {
      * @param initialQuery : The misspelled query that is being corrected
      * @return A list of (ValidQuery,Corrected_Query,KeyboardDistance) entries which are the given query modified to be closer to each respective validQuery.For each of these,keyboard distance is also stored.
      */
-    public static ArrayList<Triplet> KeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
+    public static ArrayList<Triplet> CorrectKeyboardMisType(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
 
         /*
             if query length is greater than valid query length then use LCS
@@ -360,14 +368,14 @@ public class QueryCorrection {
          */
         ArrayList<Triplet> results = new ArrayList<>();
         //if same length as valid
-        int length;
+        int minlength;
         int currentQueryEditDistance = -1;
         int updatedQueryEditDistance = 100;
-        int improvedStringEditDistance = 100;
 
         int expectedLetterIndex;
         int tmpExpectedLetterIndex;
         String correctString = "";
+        String updatedString = "";
         String query;
 
         String paddedQuery = "";
@@ -381,119 +389,100 @@ public class QueryCorrection {
             query = initialQuery;
             String validQuery = validQueryPair.left;
             currentQueryEditDistance = validQueryPair.right;
-            //improvedStringEditDistance = -1; // initial value, it does not mean anything at the start - will always be the minimum value
-
+//            System.out.println("current " + currentQueryEditDistance);
             if(query.length() < validQuery.length()) {
-                length = validQuery.length();
+                minlength = query.length();
                 paddedQuery = PadString(query,validQuery.length() - query.length());
                 paddedValidQuery = validQuery;
             } else {
-                length = query.length();
+                minlength = validQuery.length();
                 paddedQuery = query;
                 paddedValidQuery = PadString(validQuery,query.length() - validQuery.length());
             }
-
+            //change to min length and extra characters check if any decrease edit distance
             expectedLetterIndex = 0;
-            for(int i = 0; i < length; i++) {
+//            System.out.println(minlength);
+            for(int i = 0; i < minlength; i++) {
                 //System.out.println(query.charAt(i)+ " vQ:" + validQuery.charAt(i));
-                //foundCorrectAdjacent = Boolean.FALSE;
                 if(paddedQuery.charAt(i) != paddedValidQuery.charAt(i)) {
+//                    System.out.println(RemoveAccentuations(paddedQuery.charAt(i)));
                     ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(RemoveAccentuations(paddedQuery.charAt(i)),1);
-                    //System.out.println(surroundingCharacters);
-                    tmpExpectedLetterIndex = FindMostExpectedAdjacent(surroundingCharacters,paddedValidQuery,expectedLetterIndex);
-                    if(tmpExpectedLetterIndex == -1) {
-                        continue;
-                    }
-                    else {
-                        expectedLetterIndex = tmpExpectedLetterIndex;
-                    }
-                    char adjacentCharacter = paddedValidQuery.charAt(expectedLetterIndex);
-                    //for(char adjacentCharacter: surroundingCharacters) {
-                        String updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
-//                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
-                        //if(adjacentCharacter == RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex))) {
-                        //    System.out.println("eq but diff" + updatedString.charAt(i) + " padQ: " + paddedValidQuery.charAt(expectedLetterIndex) );
-                        //    updatedString = TransformToMisspelledQueries.replaceChar(updatedString,paddedValidQuery.charAt(expectedLetterIndex),i);
-                        //}
-                        updatedQueryEditDistance = EditDistance.calculate(validQuery,updatedString);
-//                        System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance );//+ " improved d" + improvedStringEditDistance);
-                        if(updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
-//                            System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
+                    //System.out.println(RemoveAccentuations(paddedQuery.charAt(i)));
+//                    System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex + " i:" + i);
+                    for(int depth = 0; depth < 3; depth++) {
+                        tmpExpectedLetterIndex = FindMostExpectedAdjacent(surroundingCharacters, paddedValidQuery, expectedLetterIndex, i, depth);
+//                        System.out.println(tmpExpectedLetterIndex);
+                        if (tmpExpectedLetterIndex == -1) {
+                            continue;
+                        } else {
+                            expectedLetterIndex = tmpExpectedLetterIndex;
+                        }
+                        char adjacentCharacter = paddedValidQuery.charAt(expectedLetterIndex);
+                        updatedString = TransformToMisspelledQueries.replaceChar(query, adjacentCharacter, i);
+                        //System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex + " i:" + i);
+                        updatedQueryEditDistance = EditDistance.calculate(validQuery, updatedString);
+                        //System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance );//+ " improved d" + improvedStringEditDistance);
+                        if (updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
+                            //System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
                             correctString = updatedString;
                             query = updatedString;
-                            //improvedStringEditDistance = updatedStringEditDistance;
-                            //if(paddedValidQuery.charAt(expectedLetterIndex) == adjacentCharacter) {
-                            //    query = updatedString;
-                                currentQueryEditDistance = updatedQueryEditDistance;
-                                //foundCorrectAdjacent = Boolean.TRUE;
-                                //improvedStringEditDistance = updatedQueryEditDistance;
-                                expectedLetterIndex++;
-                                //break;
-                            //}
+                            currentQueryEditDistance = updatedQueryEditDistance;
+                            expectedLetterIndex++;
+                            break;
                         }
-                    //}
+                    }
                 }
                 else {
                     expectedLetterIndex++;
                     continue;
                 }
             }
+//            System.out.println("q:" + query.length() + " vQ: " + validQuery.length());
+            if(validQuery.length() < query.length()) {
+//                System.out.println("INSIDE IF");
+                for(int i = minlength; i < query.length(); i++) {
+                    if(paddedQuery.charAt(i) != paddedValidQuery.charAt(i)) {
+                        ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(RemoveAccentuations(paddedQuery.charAt(i)),1);
+                        //System.out.println(surroundingCharacters);
+                        for(char adjacentCharacter: surroundingCharacters) {
+                            updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
+    //                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
+                            if(adjacentCharacter == RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex))) {
+    //                            System.out.println("eq but diff" + updatedString.charAt(i) + " padQ: " + paddedValidQuery.charAt(expectedLetterIndex) );
+                                updatedString = TransformToMisspelledQueries.replaceChar(updatedString,paddedValidQuery.charAt(expectedLetterIndex),i);
+                            }
+                            updatedQueryEditDistance = EditDistance.calculate(validQuery,updatedString);
+    //                        System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance + " improved d" + improvedStringEditDistance);
+                            if(updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
+    //                            System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
+                                correctString = updatedString;
+                                if(RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex)) == adjacentCharacter) {
+                                    query = updatedString;
+                                    currentQueryEditDistance = updatedQueryEditDistance;
+                                    expectedLetterIndex++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        expectedLetterIndex++;
+                        continue;
+                    }
+                }
+            }
+            if(correctString == "")
+                correctString = initialQuery;
             result.setLeft(validQueryPair.left);
             result.setMid(correctString);
             result.setRight(validQueryPair.right - currentQueryEditDistance);
             results.add(result);
-
-//            expectedLetterIndex = 0;
-//            for(int i = 0; i < length; i++) {
-//                //System.out.println(query.charAt(i)+ " vQ:" + validQuery.charAt(i));
-//                //foundCorrectAdjacent = Boolean.FALSE;
-//                if(paddedQuery.charAt(i) != paddedValidQuery.charAt(i)) {
-//                    ArrayList<Character> surroundingCharacters = GetSurroundingCharacters(RemoveAccentuations(paddedQuery.charAt(i)),1);
-//                    //System.out.println(surroundingCharacters);
-//                    for(char adjacentCharacter: surroundingCharacters) {
-//                        String updatedString = TransformToMisspelledQueries.replaceChar(query,adjacentCharacter,i);
-//                        System.out.println("query: "+query+" updatedstring: "+updatedString + " exp index:" + expectedLetterIndex);
-//                        if(adjacentCharacter == RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex))) {
-//                            System.out.println("eq but diff" + updatedString.charAt(i) + " padQ: " + paddedValidQuery.charAt(expectedLetterIndex) );
-//                            updatedString = TransformToMisspelledQueries.replaceChar(updatedString,paddedValidQuery.charAt(expectedLetterIndex),i);
-//                        }
-//                        updatedQueryEditDistance = EditDistance.calculate(validQuery,updatedString);
-//                        System.out.println("initial d" + currentQueryEditDistance + " updated d" + updatedQueryEditDistance + " improved d" + improvedStringEditDistance);
-//                        if(updatedQueryEditDistance < currentQueryEditDistance) {// && improvedStringEditDistance <= updatedStringEditDistance) {
-//                            System.out.println("padded valid at i:" + paddedValidQuery.charAt(expectedLetterIndex) + " adjacent: " +RemoveAccentuations(adjacentCharacter));
-//                            correctString = updatedString;
-//                            //query = updatedString;
-//                            //improvedStringEditDistance = updatedStringEditDistance;
-//                            if(RemoveAccentuations(paddedValidQuery.charAt(expectedLetterIndex)) == adjacentCharacter) {
-//                                query = updatedString;
-//                                currentQueryEditDistance = updatedQueryEditDistance;
-//                                //foundCorrectAdjacent = Boolean.TRUE;
-//                                //improvedStringEditDistance = updatedQueryEditDistance;
-//                                expectedLetterIndex++;
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//                else {
-//                    expectedLetterIndex++;
-//                    continue;
-//                }
-//            }
         }
-        /*
-            transp
-
-            if transposition then keyboard error offers nothing
-        */
         return results;
     }
 
     public static void main(String[] args) {
-        String tmp1 = "βάζχ";
-        String tmp2 = "βαωζ";
-
         char[][][] kLay = GetGreekKeyboardLayout();
-        
+
     }
 }
