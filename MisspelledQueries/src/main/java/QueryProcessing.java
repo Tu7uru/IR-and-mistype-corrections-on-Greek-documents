@@ -10,8 +10,6 @@ import static LexicalAnalysis.JsonReader.parseJsonFileQueries;
 
 public class QueryProcessing {
 
-    public static String RemovePunctuations;
-
     public static ArrayList<String> TokenizeQueries(ArrayList<Query> queries){
         //ArrayList<ArrayList<String>> tokenizedQueries = new ArrayList<>();
         ArrayList<String> tokenizedQueries = new ArrayList<>();
