@@ -78,7 +78,7 @@ public class TransformToMisspelledQueries {
         return transformedQueries;
     }
 
-    public static ArrayList<String> IncorrectSurroundingCharacter(ArrayList<String> tokenizedQueries) {
+    public static ArrayList<String> IncorrectSurroundingCharacter(ArrayList<String> tokenizedQueries, int AtPosition) {
         int length;
         int index;
         int numofletters;
@@ -91,7 +91,10 @@ public class TransformToMisspelledQueries {
 
         for(String query : tokenizedQueries) {
             length = query.length();
-            index = random.nextInt(length);
+            if(AtPosition == -1)
+                index = random.nextInt(length);
+            else
+                index = AtPosition;
             letter = query.charAt(index);
             //System.out.println(letter);
             surroundingCharacters = QueryCorrection.GetSurroundingCharacters(letter,1);
@@ -116,7 +119,7 @@ public class TransformToMisspelledQueries {
         System.out.println(AddExtraCharacter(qs));
         System.out.println(RemoveCharacter(qs));
         System.out.println(IncorrectCharacter(qs));
-        System.out.println(IncorrectSurroundingCharacter(qs));
+        System.out.println(IncorrectSurroundingCharacter(qs, -1));
 
     }
 }
