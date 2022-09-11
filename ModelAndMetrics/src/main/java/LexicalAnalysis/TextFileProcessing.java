@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.TreeMap;
 
-public class TextFileReader {
+public class TextFileProcessing {
 
     // correct words and incorrect words have the same index. for each co
     static LinkedHashSet<String> correctWords = new LinkedHashSet<>();  //  a set of words (read by the file)
@@ -48,6 +46,18 @@ public class TextFileReader {
 //        System.out.println(errNames);
 //        System.out.println(wcPair);
 //        System.out.println(cwPair);
+
+    }
+
+    public String ConvertToCommaSeperatedRow(String CorrectWord,ArrayList<String> IncorrectWords){
+        String finalOutput = CorrectWord;
+        for (String word : IncorrectWords) {
+            finalOutput += "," + word;
+        }
+        return finalOutput;
+    }
+
+    public void WriteToTextFile(LinkedHashSet<String> correctWords, LinkedHashSet<ArrayList<String>> MultipleIncorrectWords){
 
     }
 
