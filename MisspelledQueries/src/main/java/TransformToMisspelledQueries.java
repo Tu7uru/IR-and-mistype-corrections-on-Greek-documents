@@ -1,3 +1,6 @@
+import LexicalAnalysis.TextFileProcessing;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -83,6 +86,7 @@ public class TransformToMisspelledQueries {
         int index;
         int numofletters;
         char letter;
+        char mistypedCharacter;
         ArrayList<Character> surroundingCharacters;
         Random random = new Random();
 
@@ -93,23 +97,82 @@ public class TransformToMisspelledQueries {
             length = query.length();
             if(AtPosition == -1)
                 index = random.nextInt(length);
-            else
-                index = AtPosition;
+            else {
+                if(length <= AtPosition)
+                    index = length - 1;
+                else
+                    index = AtPosition;
+            }
+            System.out.println("word:" + query + " index:" + index + " length:" +length);
             letter = query.charAt(index);
             //System.out.println(letter);
             surroundingCharacters = QueryCorrection.GetSurroundingCharacters(letter,1);
             if(surroundingCharacters != null) {
                 numofletters = surroundingCharacters.size();
                 //System.out.println(numofletters);
-                transformedQuery = replaceChar(query, surroundingCharacters.get(random.nextInt(numofletters)), index);
+                while((mistypedCharacter = surroundingCharacters.get(random.nextInt(numofletters))) == ',');
+                transformedQuery = replaceChar(query, mistypedCharacter, index);
                 transformedQueries.add(transformedQuery);
             }
         }
         return transformedQueries;
     }
 
-    public static void main(String[] args) {
-        String x = "κάρδαμο";
+    public static void CreateAndDumpIncorrectSurroundingCharacter(ArrayList<String> CorrectWords, int NumOfMistypes, String Filename) throws IOException {
+
+        ArrayList<String> incAt0;
+        ArrayList<String> incAt1;
+        ArrayList<String> incAt2;
+        ArrayList<String> incAt3;
+        ArrayList<String> incAt4;
+        ArrayList<String> incAt6;
+
+        if(NumOfMistypes == 1) {
+            incAt0 = IncorrectSurroundingCharacter(CorrectWords, 0);
+            incAt1 = IncorrectSurroundingCharacter(CorrectWords, 1);
+            incAt2 = IncorrectSurroundingCharacter(CorrectWords, 2);
+            incAt3 = IncorrectSurroundingCharacter(CorrectWords, 3);
+            incAt4 = IncorrectSurroundingCharacter(CorrectWords, 4);
+            incAt6 = IncorrectSurroundingCharacter(CorrectWords, 6);
+
+        } else {
+            incAt0 = CorrectWords;
+            incAt1 = CorrectWords;
+            incAt2 = CorrectWords;
+            incAt3 = CorrectWords;
+            incAt4 = CorrectWords;
+            incAt6 = null;
+            int tmp0=0,tmp1 = 1,tmp2 = 2, tmp3 = 3, tmp4 = 4;
+            for(int pos = 0; pos < NumOfMistypes; pos++){
+                incAt0 = IncorrectSurroundingCharacter(incAt0, tmp0 + pos);
+                incAt1 = IncorrectSurroundingCharacter(incAt1, tmp1 + pos);
+                incAt2 = IncorrectSurroundingCharacter(incAt2, tmp2 + pos);
+                incAt3 = IncorrectSurroundingCharacter(incAt3, tmp3 + pos);
+                incAt4 = IncorrectSurroundingCharacter(incAt4, tmp4 + pos);
+            }
+        }
+        ArrayList<ArrayList<String>> mulitpleIncorrectWords= new ArrayList<>();
+
+        for(int index = 0; index < CorrectWords.size(); index++) {
+            ArrayList<String> incWords = new ArrayList<>();
+            incWords.add(incAt0.get(index));
+            incWords.add(incAt1.get(index));
+            incWords.add(incAt2.get(index));
+            incWords.add(incAt3.get(index));
+            incWords.add(incAt4.get(index));
+            if(NumOfMistypes == 1)
+                incWords.add(incAt6.get(index));
+            mulitpleIncorrectWords.add(incWords);
+        }
+        if(NumOfMistypes == 1)
+            TextFileProcessing.WriteToTextFile(CorrectWords,mulitpleIncorrectWords,Filename);
+        else
+            TextFileProcessing.WriteToTextFile(CorrectWords,mulitpleIncorrectWords,Filename );
+//        System.out.println(finalOutput);
+    }
+
+    public static void main(String[] args) throws IOException {
+        /*String x = "κάρδαμο";
         System.out.println(addChar(x,'ζ' ,6));
         System.out.println(removeChar(x ,0));
         System.out.println(replaceChar(x,'ζ' ,0));
@@ -120,6 +183,10 @@ public class TransformToMisspelledQueries {
         System.out.println(RemoveCharacter(qs));
         System.out.println(IncorrectCharacter(qs));
         System.out.println(IncorrectSurroundingCharacter(qs, -1));
-
+*/
+        TextFileProcessing tfProcessing = new TextFileProcessing();
+        tfProcessing.readFile("src/main/resources/names/additions.txt");
+        CreateAndDumpIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),1,"OnePerWordSubstitutions.txt");
+        CreateAndDumpIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),2,"TwoPerWordSubstitutions.txt");
     }
 }
