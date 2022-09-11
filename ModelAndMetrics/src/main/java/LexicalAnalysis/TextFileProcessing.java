@@ -1,19 +1,32 @@
 package LexicalAnalysis;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import org.w3c.dom.Text;
+
+import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 public class TextFileProcessing {
 
     // correct words and incorrect words have the same index. for each co
-    static LinkedHashSet<String> correctWords = new LinkedHashSet<>();  //  a set of words (read by the file)
-    static LinkedHashSet<ArrayList<String>> MultipleIncorrectWords = new LinkedHashSet<>(); // the error words to be produced and written in a file
+    static ArrayList<String> correctWords = new ArrayList<>();  //  a set of words (read by the file)
+    static ArrayList<ArrayList<String>> MultipleIncorrectWords = new ArrayList<>(); // the error words to be produced and written in a file
 
 //    SecureRandom rand = new SecureRandom();
+
+    public TextFileProcessing(){
+
+    }
+
+    public ArrayList<String> getCorrectWords(){
+        return this.correctWords;
+    }
+
+    public ArrayList<ArrayList<String>> getMulitpleIncorrectWords(){
+        return this.MultipleIncorrectWords;
+    }
+
 
     public static void readFile(String path) throws FileNotFoundException, IOException, FileNotFoundException {
 
@@ -49,7 +62,7 @@ public class TextFileProcessing {
 
     }
 
-    public String ConvertToCommaSeperatedRow(String CorrectWord,ArrayList<String> IncorrectWords){
+    public static String ConvertToCommaSeperatedRow(String CorrectWord, ArrayList<String> IncorrectWords){
         String finalOutput = CorrectWord;
         for (String word : IncorrectWords) {
             finalOutput += "," + word;
@@ -57,11 +70,22 @@ public class TextFileProcessing {
         return finalOutput;
     }
 
-    public void WriteToTextFile(LinkedHashSet<String> correctWords, LinkedHashSet<ArrayList<String>> MultipleIncorrectWords){
+    public static void WriteToTextFile(ArrayList<String> CorrectWords, ArrayList<ArrayList<String>> MultipleIncorrectWords, String Filename) throws IOException {
 
+        String finalOutput = "";
+        String path = "src/main/resources/names/" + Filename;
+        for(int index = 0; index < CorrectWords.size();index++) {
+            finalOutput += TextFileProcessing.ConvertToCommaSeperatedRow(CorrectWords.get(index),MultipleIncorrectWords.get(index)) + "\n";
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path, false));
+        writer.append(finalOutput);
+
+        writer.close();
     }
 
     public static void main(String[] args) throws IOException {
         ReadCommaSeperatedWords("src/main/resources/names/additions.txt");
+        //System.out.println(ConvertToCommaSeperatedRow(correctWords.get(0),MultipleIncorrectWords.get(0)));
     }
 }
