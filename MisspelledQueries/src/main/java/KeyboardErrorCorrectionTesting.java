@@ -146,7 +146,7 @@ public class KeyboardErrorCorrectionTesting {
         ArrayList<ArrayList<String>> consonants = JsonReader.parseJsonFileConsonants(path);
         System.out.println(consonants.size());
         for(ArrayList<String> consonantList : consonants) {
-            misspelledConsonants = TransformToMisspelledQueries.IncorrectSurroundingCharacter(consonantList);
+            misspelledConsonants = TransformToMisspelledQueries.IncorrectSurroundingCharacter(consonantList,-1);
 
             int listIndex = 0;
             int misspelledIndex = 0;
