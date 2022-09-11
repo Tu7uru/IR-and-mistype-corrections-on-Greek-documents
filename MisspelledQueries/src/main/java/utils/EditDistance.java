@@ -1,9 +1,11 @@
+package utils;
+
 import java.util.Arrays;
 
 /* Recursive calculation */
 public class EditDistance {
 
-    static int calculate(String x, String y) {
+    public static int calculate(String x, String y) {
         int[][] dp = new int[x.length() + 1][y.length() + 1];
 
         for (int i = 0; i <= x.length(); i++) {
