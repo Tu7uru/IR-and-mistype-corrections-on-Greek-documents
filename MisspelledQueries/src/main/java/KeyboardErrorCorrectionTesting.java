@@ -1,6 +1,8 @@
 import LexicalAnalysis.JsonReader;
-import Model.Query;
 import org.json.simple.parser.ParseException;
+import utils.EditDistance;
+import utils.Pair;
+import utils.Triplet;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,7 +123,7 @@ public class KeyboardErrorCorrectionTesting {
      * @param validQueriesAndEditDistance a list of pairs that contain the valid query(left side) and the edit distance(right) that the initialQuery(second param) has from that valid query
      * @param initialQuery the query that is corrected(possible input from a user).
      */
-    public static void TestKeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
+    public static void TestKeyboardDistance(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance, String initialQuery/*,Integer keyboardDistance*/) {
         ArrayList<Triplet> trips = QueryCorrection.CorrectKeyboardMisType(validQueriesAndEditDistance, initialQuery);
         int index = 0;
         for (Triplet trip : trips) {
