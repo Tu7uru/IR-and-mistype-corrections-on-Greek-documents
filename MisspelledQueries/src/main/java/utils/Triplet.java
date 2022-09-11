@@ -1,3 +1,5 @@
+package utils;
+
 public class Triplet<L, M, R>  {
     private L left;
     private M mid;

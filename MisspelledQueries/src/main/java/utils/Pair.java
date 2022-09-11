@@ -1,3 +1,5 @@
+package utils;
+
 public class Pair<L, R> {
         public final L left;
         public final R right;
