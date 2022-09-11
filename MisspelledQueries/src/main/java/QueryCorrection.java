@@ -1,4 +1,6 @@
-import LexicalAnalysis.JsonReader;
+import utils.EditDistance;
+import utils.Pair;
+import utils.Triplet;
 
 import java.util.ArrayList;
 
@@ -360,7 +362,7 @@ public class QueryCorrection {
      * @param initialQuery : The misspelled query that is being corrected
      * @return A list of (ValidQuery,Corrected_Query,KeyboardDistance) entries which are the given query modified to be closer to each respective validQuery.For each of these,keyboard distance is also stored.
      */
-    public static ArrayList<Triplet> CorrectKeyboardMisType(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance,String initialQuery/*,Integer keyboardDistance*/) {
+    public static ArrayList<Triplet> CorrectKeyboardMisType(ArrayList<Pair<String,Integer>> validQueriesAndEditDistance, String initialQuery/*,Integer keyboardDistance*/) {
 
         /*
             if query length is greater than valid query length then use LCS
