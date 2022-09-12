@@ -477,10 +477,17 @@ public class QueryCorrection {
                 correctString = initialQuery;
             result.setLeft(validQueryPair.left);
             result.setMid(correctString);
-            result.setRight(validQueryPair.right - currentQueryEditDistance);
+//            result.setRight(validQueryPair.right - currentQueryEditDistance);
+            result.setRight(currentQueryEditDistance);
             results.add(result);
         }
         return results;
+    }
+
+
+    public static ArrayList<Triplet> EditDistanceOnKeyboardMistypeCorrection(ArrayList<Triplet> results){
+
+        return null;
     }
 
     public static void main(String[] args) {
