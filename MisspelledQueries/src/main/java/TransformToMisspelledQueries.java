@@ -29,6 +29,7 @@ public class TransformToMisspelledQueries {
         int length;
         int index;
         int numofletters = 24;
+        char extra;
         Random random = new Random();
 
         String transformedQuery;
@@ -37,7 +38,8 @@ public class TransformToMisspelledQueries {
         for(String query : tokenizedQueries) {
             length = query.length();
             index = random.nextInt(length);
-            transformedQuery = addChar(query,greekLetters[random.nextInt(numofletters)],index);
+            while((extra = greekLetters[random.nextInt(numofletters)]) == ',');
+            transformedQuery = addChar(query,extra,index);
             transformedQueries.add(transformedQuery);
         }
 
@@ -103,7 +105,7 @@ public class TransformToMisspelledQueries {
                 else
                     index = AtPosition;
             }
-            System.out.println("word:" + query + " index:" + index + " length:" +length);
+//            System.out.println("word:" + query + " index:" + index + " length:" +length);
             letter = query.charAt(index);
             //System.out.println(letter);
             surroundingCharacters = QueryCorrection.GetSurroundingCharacters(letter,1);
@@ -135,7 +137,7 @@ public class TransformToMisspelledQueries {
             incAt4 = IncorrectSurroundingCharacter(CorrectWords, 4);
             incAt6 = IncorrectSurroundingCharacter(CorrectWords, 6);
 
-        } else {
+        } else if(NumOfMistypes == 2){
             incAt0 = CorrectWords;
             incAt1 = CorrectWords;
             incAt2 = CorrectWords;
@@ -151,6 +153,21 @@ public class TransformToMisspelledQueries {
                 incAt4 = IncorrectSurroundingCharacter(incAt4, tmp4 + pos);
             }
         }
+        else {
+            incAt0 = CorrectWords;
+            incAt1 = CorrectWords;
+            incAt2 = CorrectWords;
+            incAt3 = CorrectWords;
+            incAt4 = null;
+            incAt6 = null;
+            int tmp0=0,tmp1 = 1,tmp2 = 2, tmp3 = 3, tmp4 = 4;
+            for(int pos = 0; pos < NumOfMistypes; pos++){
+                incAt0 = IncorrectSurroundingCharacter(incAt0, tmp0 + pos);
+                incAt1 = IncorrectSurroundingCharacter(incAt1, tmp1 + pos);
+                incAt2 = IncorrectSurroundingCharacter(incAt2, tmp2 + pos);
+                incAt3 = IncorrectSurroundingCharacter(incAt3, tmp3 + pos);
+            }
+        }
         ArrayList<ArrayList<String>> mulitpleIncorrectWords= new ArrayList<>();
 
         for(int index = 0; index < CorrectWords.size(); index++) {
@@ -159,7 +176,8 @@ public class TransformToMisspelledQueries {
             incWords.add(incAt1.get(index));
             incWords.add(incAt2.get(index));
             incWords.add(incAt3.get(index));
-            incWords.add(incAt4.get(index));
+            if(NumOfMistypes <= 2)
+                incWords.add(incAt4.get(index));
             if(NumOfMistypes == 1)
                 incWords.add(incAt6.get(index));
             mulitpleIncorrectWords.add(incWords);
@@ -194,14 +212,24 @@ public class TransformToMisspelledQueries {
         tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubstitutionIncorrectWords1,"OnePerWordSubstitutions.txt");
 
         // 1 mistype and character addition
+        ArrayList<ArrayList<String>> SubNExtra_incorrectWords = new ArrayList<>();
         for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords1) {
-//            for (int index = 0; index < tfProcessing.getCorrectWords().size(); )
-//            for(String incWord: incorrectWords) {
-                SubNExtra_incorrectWords = AddExtraCharacter(incorrectWords);
-//            }
+             SubNExtra_incorrectWords.add(AddExtraCharacter(incorrectWords));
         }
+        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"OneSubstitutionAndAddition.txt");
         // 2 mistypes
         ArrayList<ArrayList<String>> SubstitutionIncorrectWords2 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),2);
         tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubstitutionIncorrectWords2,"TwoPerWordSubstitutions.txt");
+
+        // 2 mistypes and character addition
+        SubNExtra_incorrectWords = new ArrayList<>();
+        for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords2) {
+            SubNExtra_incorrectWords.add(AddExtraCharacter(incorrectWords));
+        }
+        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"TwoSubstitutionsAndAddition.txt");
+
+        //3 mistypes
+        ArrayList<ArrayList<String>> SubstitutionIncorrectWords3 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),3);
+        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubstitutionIncorrectWords3,"ThreePerWordSubstitutions.txt");
     }
 }
