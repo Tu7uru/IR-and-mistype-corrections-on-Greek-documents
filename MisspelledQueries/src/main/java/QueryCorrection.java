@@ -1,7 +1,9 @@
+import LexicalAnalysis.TextFileProcessing;
 import utils.EditDistance;
 import utils.Pair;
 import utils.Triplet;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class QueryCorrection {
@@ -355,6 +357,16 @@ public class QueryCorrection {
         return mostExpectedIndex;
     }
 
+    public static ArrayList<Pair<String,Integer>> convertToValidWordsAndEditDistance(ArrayList<String> validWords, String query){
+
+        ArrayList<Pair<String,Integer>> pairsForEachWord = new ArrayList<>();
+        for(String word : validWords) {
+            Pair<String,Integer> pair = new Pair<>(word,EditDistance.calculate(word,query));
+            pairsForEachWord.add(pair);
+        }
+        return pairsForEachWord;
+    }
+
     /**
      * Takes a misspelled query and a list of valid queries
      *
@@ -384,7 +396,7 @@ public class QueryCorrection {
         String paddedValidQuery = "";
 
         for(Pair<String,Integer> validQueryPair : validQueriesAndEditDistance) {
-
+            //System.out.println(validQueryPair.left);
             Triplet result = new Triplet();
 
             correctString = "";
@@ -490,8 +502,14 @@ public class QueryCorrection {
         return null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         char[][][] kLay = GetGreekKeyboardLayout();
-
+        TextFileProcessing tfp = new TextFileProcessing();
+        tfp.readFile("src/main/resources/names/TwoPerWordSubstitutions.txt");
+        for(ArrayList<String> incWords : tfp.getMulitpleIncorrectWords()) {
+            for(String word : incWords) {
+                CorrectKeyboardMisType(convertToValidWordsAndEditDistance(tfp.getCorrectWords(),word),word);
+            }
+        }
     }
 }
