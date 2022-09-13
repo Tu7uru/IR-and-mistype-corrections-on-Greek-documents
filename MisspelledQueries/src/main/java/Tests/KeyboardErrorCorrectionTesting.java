@@ -1,9 +1,14 @@
+package Tests;
+
+import KeyboardMistype.QueryCorrection;
 import LexicalAnalysis.JsonReader;
 import LexicalAnalysis.TextFileProcessing;
 import org.json.simple.parser.ParseException;
 import utils.EditDistance;
 import utils.Pair;
+import utils.TransformToMisspelledQueries;
 import utils.Triplet;
+import utils.KeyboardLayoutCoordinates;
 
 import java.io.IOException;
 import java.util.ArrayList;
