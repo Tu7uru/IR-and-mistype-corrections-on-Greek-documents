@@ -1,3 +1,6 @@
+package utils;
+
+import KeyboardMistype.QueryCorrection;
 import LexicalAnalysis.TextFileProcessing;
 
 import java.io.IOException;

@@ -1,3 +1,5 @@
+package utils;
+
 public class KeyboardLayoutCoordinates {
     private final Integer row;
     private final Integer col;
