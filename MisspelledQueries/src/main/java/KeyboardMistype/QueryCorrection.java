@@ -1,7 +1,7 @@
+package KeyboardMistype;
+
 import LexicalAnalysis.TextFileProcessing;
-import utils.EditDistance;
-import utils.Pair;
-import utils.Triplet;
+import utils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -498,7 +498,7 @@ public class QueryCorrection {
     }
 
 
-    public static ArrayList<Triplet> SortAndFilterWithEditDistance(ArrayList<Triplet> results, int EditDistance){
+    public static ArrayList<Triplet> FilterWithEditDistance(ArrayList<Triplet> results, int EditDistance){
 
         ArrayList<Triplet> filteredResults = new ArrayList<>();
 
@@ -507,8 +507,6 @@ public class QueryCorrection {
             if((int) res.getRight() <= EditDistance )
                 filteredResults.add(res);
         }
-        // sort on edit distance
-        Collections.sort(filteredResults,Triplet.OnTripletRight);
 
         return filteredResults;
     }
@@ -518,13 +516,14 @@ public class QueryCorrection {
         TextFileProcessing tfp = new TextFileProcessing();
         tfp.readFile("src/main/resources/names/TwoPerWordSubstitutions.txt");
         for(ArrayList<String> incWords : tfp.getMulitpleIncorrectWords()) {
+            System.out.println(incWords);
             for(String word : incWords) {
                 ArrayList<Pair<String,Integer>> pairs = convertToValidWordsAndEditDistance(tfp.getCorrectWords(),word);
                 ArrayList<Triplet> results = CorrectKeyboardMisType(pairs,word);
-                SortAndFilterWithEditDistance(results,2);
+                FilterWithEditDistance(results,2);
                 int listIndex = 0;
                 for (Triplet trip : results) {
-                    System.out.println("correct: " + trip.getLeft() + " initial:" + word + " final: " + trip.getMid() + " old distance: " + EditDistance.calculate((String)trip.getLeft(),word) + " new distance: " + trip.getRight());
+//                    System.out.println("correct: " + trip.getLeft() + " initial:" + word + " final: " + trip.getMid() + " old distance: " + EditDistance.calculate((String)trip.getLeft(),word) + " new distance: " + trip.getRight());
 //                        System.out.println( "\\selectlanguage{greek}" + trip.getLeft() + " & \\selectlanguage{greek}" + misspelledConsonants.get(misspelledIndex) + " & \\selectlanguage{greek}" + trip.getMid() +  " & " + ListOfQueriesAndEditDistance.get(listIndex).right  + " & " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " \\\\");
 //                        System.out.println("\\hline");
                     listIndex++;

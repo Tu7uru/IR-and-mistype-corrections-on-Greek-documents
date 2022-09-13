@@ -1,4 +1,5 @@
 import LexicalAnalysis.JsonReader;
+import LexicalAnalysis.TextFileProcessing;
 import org.json.simple.parser.ParseException;
 import utils.EditDistance;
 import utils.Pair;
@@ -134,16 +135,39 @@ public class KeyboardErrorCorrectionTesting {
         }
     }
 
+    public static void TestKeyboardDistanceCorrectionBulkFromTextFile(String path,String type) throws IOException {
+        TextFileProcessing tfp = new TextFileProcessing();
+        tfp.readFile(path);
+        for(ArrayList<String> incWords : tfp.getMulitpleIncorrectWords()) {
+            for(String word : incWords) {
+                ArrayList<Pair<String,Integer>> pairs = QueryCorrection.convertToValidWordsAndEditDistance(tfp.getCorrectWords(),word);
+                ArrayList<Triplet> results = QueryCorrection.CorrectKeyboardMisType(pairs,word);
+                if(type == "KeyboardMistypeNEditDistance")
+                    results = QueryCorrection.FilterWithEditDistance(results,2);
+//                int listIndex = 0;
+                for (Triplet trip : results) {
+
+//                    System.out.println("correct: " + trip.getLeft() + " initial:" + word + " final: " + trip.getMid() + " old distance: " + EditDistance.calculate((String)trip.getLeft(),word) + " new distance: " + trip.getRight());
+//                        System.out.println( "\\selectlanguage{greek}" + trip.getLeft() + " & \\selectlanguage{greek}" + misspelledConsonants.get(misspelledIndex) + " & \\selectlanguage{greek}" + trip.getMid() +  " & " + ListOfQueriesAndEditDistance.get(listIndex).right  + " & " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " \\\\");
+//                        System.out.println("\\hline");
+//                    listIndex++;
+                }
+//                listIndex++;
+            }
+        }
+    }
+
+
     /**
      * Test - Apply keyboardDistance on Consonants file for bulk checking of the algorithm
      * Note: Bulk checking is responsible to take consonants and create the misspelled queries too
      *
-     * @param path path to consonants file
+     * @param JsonPath path to consonants file
      */
-    public static void TestKeyboardDistanceBulk(String path) throws IOException, ParseException {
+    public static void TestKeyboardDistanceCorrectionBulk(String JsonPath) throws IOException, ParseException {
         ArrayList<String> misspelledConsonants = new ArrayList<>();
 
-        ArrayList<ArrayList<String>> consonants = JsonReader.parseJsonFileConsonants(path);
+        ArrayList<ArrayList<String>> consonants = JsonReader.parseJsonFileConsonants(JsonPath);
         System.out.println(consonants.size());
         for(ArrayList<String> consonantList : consonants) {
             misspelledConsonants = TransformToMisspelledQueries.IncorrectSurroundingCharacter(consonantList,-1);
@@ -168,7 +192,7 @@ public class KeyboardErrorCorrectionTesting {
                     ArrayList<Triplet> results = QueryCorrection.CorrectKeyboardMisType(ListOfQueriesAndEditDistance, misspelledConsonants.get(misspelledIndex));
                     listIndex = 0;
                     for (Triplet trip : results) {
-                        System.out.println("correct: " + trip.getLeft() + " initial:" + misspelledConsonants.get(misspelledIndex) + " final: " + trip.getMid() + " old distance: " + ListOfQueriesAndEditDistance.get(listIndex).right + " new distance: " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " num of keyboard distance changes applied:" + trip.getRight());
+                        System.out.println("correct: " + trip.getLeft() + " initial:" + misspelledConsonants.get(misspelledIndex) + " final: " + trip.getMid() + " old distance: " + ListOfQueriesAndEditDistance.get(listIndex).right + " new distance: " + trip.getRight());
 //                        System.out.println( "\\selectlanguage{greek}" + trip.getLeft() + " & \\selectlanguage{greek}" + misspelledConsonants.get(misspelledIndex) + " & \\selectlanguage{greek}" + trip.getMid() +  " & " + ListOfQueriesAndEditDistance.get(listIndex).right  + " & " + EditDistance.calculate((String) trip.getLeft(), (String) trip.getMid()) + " \\\\");
 //                        System.out.println("\\hline");
                         listIndex++;
@@ -242,6 +266,6 @@ public class KeyboardErrorCorrectionTesting {
 //        TestKeyboardDistance(validQs,"νσχβ");
         //EOF 4 words
 
-        TestKeyboardDistanceBulk("src/main/resources/consonants.json");
+        TestKeyboardDistanceCorrectionBulk("src/main/resources/consonants.json");
     }
 }
