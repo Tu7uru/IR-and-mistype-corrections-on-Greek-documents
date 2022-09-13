@@ -1,3 +1,5 @@
+package KeyboardMistype;
+
 import LexicalAnalysis.JsonReader;
 import Model.Query;
 import org.json.simple.parser.ParseException;
