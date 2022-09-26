@@ -208,28 +208,61 @@ public class TransformToMisspelledQueries {
 */
 
         // CREATE mistyped queries
+        //init
         TextFileProcessing tfProcessing = new TextFileProcessing();
         tfProcessing.readFile("src/main/resources/names/additions.txt");
+        ArrayList<ArrayList<String>> SubNExtra_incorrectWords;
+        // Start of creation
+
         // 1 mistype
 //        ArrayList<ArrayList<String>> SubstitutionIncorrectWords1 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),1);
 //        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubstitutionIncorrectWords1,"OnePerWordSubstitutions.txt");
 
         // 1 mistype and character addition
-//        ArrayList<ArrayList<String>> SubNExtra_incorrectWords = new ArrayList<>();
+//        SubNExtra_incorrectWords = new ArrayList<>();
 //        for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords1) {
 //             SubNExtra_incorrectWords.add(AddExtraCharacter(incorrectWords));
 //        }
 //        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"OneSubstitutionAndAddition.txt");
+
+        //1 mistype and character deletion(deletion happens first)
+//        ArrayList<String> Removal_incorrectWords = RemoveCharacter(tfProcessing.getCorrectWords());
+//        ArrayList<ArrayList<String>> RemovalNSub_incorrectWords = CreateIncorrectSurroundingCharacter(Removal_incorrectWords,1);
+//        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),RemovalNSub_incorrectWords,"OneSubstitutionAndDeletion.txt");
+
+
         // 2 mistypes
 //        ArrayList<ArrayList<String>> SubstitutionIncorrectWords2 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),2);
 //        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubstitutionIncorrectWords2,"TwoPerWordSubstitutions.txt");
 
         // 2 mistypes and character addition
+//        ArrayList<ArrayList<String>> SubstitutionIncorrectWords2 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),2);
 //        SubNExtra_incorrectWords = new ArrayList<>();
 //        for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords2) {
 //            SubNExtra_incorrectWords.add(AddExtraCharacter(incorrectWords));
 //        }
 //        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"TwoSubstitutionsAndAddition.txt");
+
+        // 2 mistypes and 2 character addition
+//        SubNExtra_incorrectWords = new ArrayList<>();
+//        for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords2) {
+//            SubNExtra_incorrectWords.add(AddExtraCharacter(AddExtraCharacter(incorrectWords)));
+//        }
+//        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"TwoSubstitutionsAndTwoAdditions.txt");
+
+        // 2 mistypes and 3 character additions
+//        SubNExtra_incorrectWords = new ArrayList<>();
+//        for(ArrayList<String> incorrectWords : SubstitutionIncorrectWords2) {
+//            SubNExtra_incorrectWords.add(AddExtraCharacter(AddExtraCharacter(AddExtraCharacter(incorrectWords))));
+//        }
+//        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),SubNExtra_incorrectWords,"TwoSubstitutionsAndThreeAdditions.txt");
+
+
+        //2 mistypes and character removal(first removal then mistypes)
+//        ArrayList<String> Removal_incorrectWords = RemoveCharacter(tfProcessing.getCorrectWords());
+//        ArrayList<ArrayList<String>> RemovalNSub_incorrectWords = CreateIncorrectSurroundingCharacter(Removal_incorrectWords,2);
+//        tfProcessing.WriteToTextFile(tfProcessing.getCorrectWords(),RemovalNSub_incorrectWords,"TwoSubstitutionsAndDeletion.txt");
+
 
         //3 mistypes
 //        ArrayList<ArrayList<String>> SubstitutionIncorrectWords3 = CreateIncorrectSurroundingCharacter(tfProcessing.getCorrectWords(),3);
