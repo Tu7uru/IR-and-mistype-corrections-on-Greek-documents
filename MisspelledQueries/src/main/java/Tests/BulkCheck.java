@@ -154,8 +154,8 @@ public class BulkCheck {
         }*/
 
         String DatasetFiles[]		= {
-//        	"Resources/names/additions.txt", 			// additions
-//        	"Resources/names/subs.txt", 				// subtitutions
+        	"src/main/Resources/names/additions.txt", 			// additions
+        	"src/main/Resources/names/subs.txt", 				// subtitutions
 //        	"Resources/names/deletions.txt", 			// deletions
 //        	"Resources/names/same_sounded.txt",  		// same sounded
 //        	"Resources/names/same_soundedExtended.txt", 	// same sounded (extended)
@@ -167,7 +167,11 @@ public class BulkCheck {
                 "src/main/resources/names/ThreePerWordSubstitutions.txt",
                 "src/main/resources/names/FourPerWordSubstitutions.txt",
                 "src/main/resources/names/OneSubstitutionAndAddition.txt",
-                "src/main/resources/names/TwoSubstitutionsAndAddition.txt"
+                "src/main/resources/names/TwoSubstitutionsAndAddition.txt",
+                "src/main/resources/names/TwoSubstitutionsAndTwoAdditions.txt",
+                "src/main/resources/names/TwoSubstitutionsAndThreeAdditions.txt",
+                "src/main/resources/names/OneSubstitutionAndDeletion.txt",
+                "src/main/resources/names/TwoSubstitutionsAndDeletion.txt"
 
         };  // evaluation collections
 
@@ -180,9 +184,9 @@ public class BulkCheck {
 //        		"stemAndsoundex",
 //        		"fullPhonetic",
                 "editDistance1",
-                "editDistance2",
-                "editDistance3",
-                "editDistance4",
+//                "editDistance2",
+//                "editDistance3",
+//                "editDistance4",
                 "KeyboardMistype",
                 "KeyboardMistypeNEditDistance1",
                 "KeyboardMistypeNEditDistance2"
