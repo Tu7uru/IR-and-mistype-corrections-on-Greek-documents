@@ -229,6 +229,9 @@ public class KeyboardErrorCorrectionTesting {
 //validQs.add(new Pair("ακόλλητος",3));
 //        TestKeyboardDistance(validQs,"αοοοόλλητος");
 
+        validQs.add(new Pair("μήνυμα",3));
+        TestKeyboardDistance(validQs,"μοούνυμα");
+
 
 //        validQs.add(new Pair("αίτημα",4));
 //        TestKeyboardDistance(validQs,"αοοουημα");
@@ -271,6 +274,6 @@ public class KeyboardErrorCorrectionTesting {
 //        TestKeyboardDistance(validQs,"νσχβ");
         //EOF 4 words
 
-        TestKeyboardDistanceCorrectionBulk("src/main/resources/consonants.json");
+//        TestKeyboardDistanceCorrectionBulk("src/main/resources/consonants.json");
     }
 }
