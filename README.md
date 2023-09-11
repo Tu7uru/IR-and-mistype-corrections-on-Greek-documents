@@ -19,10 +19,8 @@ Subject: Information Retrieval from Greek Documents: Evaluations and Improvement
       - [ES - Required Format - Bulk Indexing](#es---required-format---bulk-indexing)
       - [ES - Indexing example](#es---indexing-example)
     - [Querying in Elastic Search](#querying-in-elastic-search)
-      - [ES - Querying Required Format](#es---querying-required-format)
-    - [Indexing in Solr](#indexing-in-solr)
-    - [Indexing in Algolia](#indexing-in-algolia)
   - [Improvements on misspelled Queries](#improvements-on-misspelled-queries)
+  - [SoundexGR algorithm](#soundexgr-algorithm)
 
 ## Introduction
 
@@ -172,8 +170,8 @@ Querying is possible via the Kibana developer tools console and REST requests. A
 
 ## Improvements on misspelled Queries
 
-See the final documented file in the Docu folder.
+See the final documented file in the /doc/Ptyxiaki_IRGreekDocs_HV_3744.pdf file.
 
 ## SoundexGR algorithm
 
-See https://github.com/YannisTzitzikas/SoundexGR
+See [SoundexGR](https://github.com/YannisTzitzikas/SoundexGR)
