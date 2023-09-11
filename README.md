@@ -170,10 +170,10 @@ Note : Credentials are needed when the communication uses https. In case of http
 
 Querying is possible via the Kibana developer tools console and REST requests. A script was mainly used due to the large number of queries (instead of the console)
 
-#### ES - Querying Required Format
-
-### Indexing in Solr
-
-### Indexing in Algolia
-
 ## Improvements on misspelled Queries
+
+See the final documented file in the Docu folder.
+
+## SoundexGR algorithm
+
+See https://github.com/YannisTzitzikas/SoundexGR
