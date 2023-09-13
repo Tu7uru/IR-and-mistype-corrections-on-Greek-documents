@@ -40,7 +40,8 @@ public class Search {
             indexName = "dataset_WithoutStopwords";
             //LoggedIn in Algolia
             //https://www.algolia.com/users/sign_in
-            SearchClient client = DefaultSearchClient.create("8GUR9FCZWE", "fc335f14e36e7b8140811fdac99c26a4");
+            // Log in Algolia and go to API keys and replace string with the specific values
+            SearchClient client = DefaultSearchClient.create("ApplicationID", "AdminAPIKey");
 
             // Create a new index and add a record (using the `Record` class)
             SearchIndex<Document> index = client.initIndex(indexName, Document.class);
@@ -88,7 +89,9 @@ public class Search {
             indexName = "dataset";
             //LoggedIn in Algolia
             //https://www.algolia.com/users/sign_in
-            SearchClient client = DefaultSearchClient.create("8GUR9FCZWE", "fc335f14e36e7b8140811fdac99c26a4");
+            // Log in Algolia and go to API keys and replace string with the specific values
+            SearchClient client = DefaultSearchClient.create("ApplicationID", "AdminAPIKey");
+
 
             // Create a new index and add a record (using the `Record` class)
             SearchIndex<Document> index = client.initIndex(indexName, Document.class);
